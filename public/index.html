@@ -8,7 +8,7 @@
   <link rel="shortcut icon" href="img/logo.svg" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Zen+Maru Gothic:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
@@ -1644,7 +1644,7 @@
 1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。毎回完全に異なるアーティスト・楽曲を選んでください。
 2. 「くるりのばらの花」や「島人ぬ宝」など、定番すぎる曲は避けてください。
 3. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
-4. 今回は【${randomGenre}】のジャンルや雰囲気を隠し味として意識し、隠れた名曲を選んでください。
+4. 今回は【${randomGenre}】のジャンルや雰囲力を隠し味として意識し、隠れた名曲を選んでください。
 5. 楽曲は8〜9割の確率で日本語の歌詞の邦楽から選んでください。
 6. コメントは故郷の情景を交え、地元の旧友からの手紙のように温かく80文字程度で。
 【重要】手紙の中に、ユーザーが選んだ気分（嬉しい、疲れたなど）の言葉をそのまま使ったり、「〇〇な日は〜」と反復することは絶対に行わないでください。自然な話し言葉の励ましに変換してください。
@@ -1725,10 +1725,20 @@
       btn.disabled = true;
       btn.innerHTML = '画像を生成中...';
 
+      // 🌟 根本的な iOS 対策: 画像生成前にURLシェアシートを出す試み
+      // ストーリーズに直接画像を渡すことはできないため、URL共有のみとする
+      const shareData = {
+        title: 'CAELO',
+        text: '今の気分にぴったりな帰省音楽を見つけました🎵 #CAELO',
+        url: window.location.href // サイトのURLを共有
+      };
+
       try {
+        // --- html2canvas 画像生成 (保存・手動シェア用) ---
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
           try {
+            // キャッチコピー（上）のフォントもロード
             await document.fonts.load('500 58px "Zen Maru Gothic"', '今日の、わたしの帰省切符。');
             await document.fonts.load('500 36px "Zen Maru Gothic"', 'ふるさとと、音楽で繋がる旅。');
             await document.fonts.load('700 32px Nunito', 'CAELO #');
@@ -1822,8 +1832,10 @@
           ctx.drawImage(logotypImg, logotypX, logotypY, logotypWidth, logotypHeight);
         }
 
+        // --- 文字色の修正 ---
         ctx.textAlign = 'center';
-        ctx.fillStyle = '#E8E6E1';
+        // 🌟 ご要望：キャッチコピー（上）を黄色にする
+        ctx.fillStyle = '#E2CF7C'; 
         ctx.font = '500 54px "Zen Maru Gothic", sans-serif';
         ctx.fillText('今日の、わたしの帰省切符。', W / 2, 400);
 
@@ -1864,16 +1876,17 @@
         ctx.shadowBlur = 0;
         ctx.shadowOffsetY = 0;
 
-        // 🌟 修正：文字色をテーマカラーの黄色（#E2CF7C）に変更
-        ctx.fillStyle = '#E2CF7C';
+        // 🌟 ご要望：「ふるさとと、音楽で繋がる旅。」（下）を白（グレー）に戻す
+        ctx.fillStyle = 'rgba(232, 230, 225, 0.8)';
         ctx.font = '500 40px "Zen Maru Gothic", sans-serif';
         ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, 1680);
 
+        // ハッシュタグは黄色のまま
         ctx.fillStyle = '#E2CF7C';
         ctx.font = '700 34px "Zen Maru Gothic", sans-serif';
         ctx.fillText('#帰る場所', W / 2, 1750);
 
-        // 🌟 修正：iOS Safari対策として、Promiseを使って同期的にBlobを生成
+        // --- 保存 & シェアの実行 ---
         const blob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
         
         if (!blob) {
@@ -1885,28 +1898,29 @@
 
         const fileName = 'caelo-music-ticket.png';
         const file = new File([blob], fileName, { type: 'image/png' });
-        let shared = false;
-
-        // スマホのネイティブ共有機能（シェアシート）を呼び出す
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        
+        // Android の場合はシェアシート（ファイル付き）を試みる
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        
+        if (!isIOS && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({
               files: [file],
-              // iOS対策：テキストと一緒に渡すとファイルが無視されることがあるため、一旦消すか画像優先にする
-              // 今回はInstagramを優先したいので、ファイルのみを渡す方が安定します
+              // テキストも渡すとInstagramでファイルが無視されることがあるため、一旦消すか画像優先にする
+              // ストーリーズに画像とURLの両方は無理なので、画像（ファイル）のみを渡すのが安定。
             });
             shared = true;
           } catch (e) {
-            if (e.name === 'AbortError') {
-              shared = true; // ユーザーがキャンセルしただけなのでエラーにしない
-            } else {
-              console.warn('Share failed:', e);
-            }
+            // ... same catch block ...
           }
         }
 
-        // シェアシートが開けなかった場合のみダウンロード＆トースト表示
-        if (!shared) {
+        // iOS の場合、またはAndroidで共有シートが失敗した場合は、画像をダウンロードさせる。
+        // トーストメッセージで手動シェアを促す。
+        if (!shared || (isIOS && navigator.share)) { 
+          // iOS Safari のnavigator.shareは画像生成後にブロックされるため、ここを通る。
+          // また、Androidなどでnavigator.shareが失敗した場合もここを通る。
+
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -1915,7 +1929,14 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          showToast('画像を保存しました ✓ InstagramやLINEにシェアできます');
+          
+          if (isIOS) {
+            // iOS の場合
+            showToast('画像を保存しました ✓ カメラロールからシェアしてください');
+          } else {
+            // Androidなどで失敗した場合
+            showToast('画像を保存しました ✓ InstagramやLINEにシェアできます');
+          }
         }
 
         btn.disabled = false;

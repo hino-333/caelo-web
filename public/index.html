@@ -8,7 +8,7 @@
   <link rel="shortcut icon" href="img/logo.svg" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Zen+Maru Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
@@ -776,7 +776,7 @@
   <div id="screen-top" class="screen active">
     <div class="logo-container">
       <img src="img/logo.svg" alt="CAELO Icon" class="main-logo">
-      <img src="img/logotyp.svg" alt="CAELO" class="main-logotype">
+      <img src="img/logotype.svg" alt="CAELO" class="main-logotype">
       <div class="brand-subtitle">- 音楽で帰ろう -</div>
     </div>
 
@@ -1625,9 +1625,18 @@
         await sleep(2200);
         await setLoading(`今のあなたの気分と、<br>${prefName}の空気を繋ぐ音楽を探しています...`);
 
-        const genreHints = ['90年代J-POP', '2000年代J-POP', '最近の邦楽インディーズ', 'シティポップ', '日本の女性シンガーソングライター', '日本の男性シンガーソングライター', 'アコースティックな邦楽の弾き語り', '日本のオルタナティヴ・ロック', 'J-Rock', '日本のフォーク', '昭和歌謡', 'チル系の邦楽', '邦楽のローファイ・ヒップホップ', '日本のネオソウル/R&B', 'ピアノが美しい邦楽', '日本のバンドサウンド', 'ボカロP出身アーティスト', 'アニメ・映画主題歌の名曲(邦楽)'];
+        const genreHints = [
+          '90年代J-POPの心に染みる名曲', '2000年代の懐かしいヒット曲', '2010年代の隠れた名曲', '2020年代の隠れた名曲',
+          '有名アーティストのファンに愛される名曲', '夜に聴きたいシティポップ', 
+          '日本の女性シンガーソングライターの定番曲', '日本の男性シンガーソングライターのエモい曲', 
+          'アコースティックな邦楽', '日本のオルタナティヴ・ロック（邦ロック）の定番', 
+          'エモいJ-Rock', '昭和歌謡・平成レトロな名曲', 'チル系の邦楽（深夜に合う）', 
+          '最近の邦楽（少し落ち着いた曲）', '日本のネオソウル/R&B', 
+          'ピアノが美しい邦楽', 'ボカロP出身アーティストのエモーショナルな楽曲',
+          'アニメ・映画主題歌の心に残る名曲(邦楽)'
+        ];
         const randomGenre = genreHints[Math.floor(Math.random() * genreHints.length)];
-        const randomSeed  = Math.floor(Math.random() * 100000);
+        const randomSeed  = Math.floor(Math.random() * 1000000);
 
         const aiResponse = await fetch('/api/chat', {
           method: 'POST',
@@ -1635,17 +1644,17 @@
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-5.4-mini',
+            model: 'gpt-4o-mini',
             messages: [
               {
                 role: 'system',
-                content: `あなたはユーザーに「帰る場所」を提供する優秀なDJです。
+                content: `あなたはユーザーに「帰る場所」を提供する、音楽への愛が深いDJです。
 【絶対ルール】
-1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。毎回完全に異なるアーティスト・楽曲を選んでください。
-2. 「くるりのばらの花」や「島人ぬ宝」など、定番すぎる曲は避けてください。
-3. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
-4. 今回は【${randomGenre}】のジャンルや雰囲力を隠し味として意識し、隠れた名曲を選んでください。
-5. 楽曲は8〜9割の確率で日本語の歌詞の邦楽から選んでください。
+1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。前回の選曲履歴は完全に忘れ、毎回異なるアーティスト・楽曲を選んでください。
+2. 知名度のバランスが命です。全く知らないマイナー曲ではなく、Mr.Childrenの「口笛」のような【ある程度知名度はあるが、ベタすぎない絶妙なライン（ファンに愛される名曲、少し懐かしいヒット曲、有名アーティストのエモい曲）】を狙って選曲してください。
+3. 今回は【${randomGenre}】のジャンルや雰囲気を隠し味として意識してください。
+4. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
+5. 楽曲は9割以上の確率で日本語の歌詞の邦楽から選んでください。
 6. コメントは故郷の情景を交え、地元の旧友からの手紙のように温かく80文字程度で。
 【重要】手紙の中に、ユーザーが選んだ気分（嬉しい、疲れたなど）の言葉をそのまま使ったり、「〇〇な日は〜」と反復することは絶対に行わないでください。自然な話し言葉の励ましに変換してください。
 【超重要】アルバム名ではなく、必ず単一の「楽曲名（1曲）」を選曲してください。
@@ -1653,7 +1662,7 @@
               },
               { role: 'user', content: `私の気分は「${moodText}」、故郷は「${prefName}」、故郷の今の天気は「${weatherString}」です。私にぴったりな1曲を選んでください。` }
             ],
-            temperature: 0.9,
+            temperature: 1.15, // 多様性を出しつつ、存在しない曲のハルシネーションを防ぐ絶妙なライン
             response_format: { type: "json_object" }
           })
         });

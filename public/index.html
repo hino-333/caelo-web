@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CAELO - 音楽で帰ろう -</title>
+  <meta name="theme-color" content="#0E1015">
+  <link rel="shortcut icon" href="img/logo.svg" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #15171C;
+      --bg-deep: #0E1015;
+      --accent-color: #E2CF7C;
+      --accent-soft: #F0E5B5;
+      --text-main: #E8E6E1;
+      --text-muted: rgba(232, 230, 225, 0.65);
+      --tag-bg: rgba(255, 255, 255, 0.06);
+      --tag-border: rgba(255, 255, 255, 0.12);
+      --ticket-bg: #F5F2EB;
+      --ticket-text: #2C2A29;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden;}
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: radial-gradient(ellipse at top, #1f2230 0%, var(--bg-color) 45%, var(--bg-deep) 100%);
+      font-family: 'Zen Maru Gothic', sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      display: flex;
+      align-items: safe center;
+      justify-content: center;
+      transition: background 1.6s ease;
+      position: relative;
+    }
+
+    .ambient-particles {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .ambient-particles span {
+      position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%;
+      opacity: 0; animation: drift linear infinite;
+      box-shadow: 0 0 6px rgba(255,255,255,0.6);
+    }
+    @keyframes drift {
+      0%   { transform: translateY(110vh) translateX(0); opacity: 0; }
+      10%  { opacity: 0.8; }
+      90%  { opacity: 0.6; }
+      100% { transform: translateY(-10vh) translateX(40px); opacity: 0; }
+    }
+
+    .screen {
+      position: absolute; width: 100%; max-width: 520px; padding: 2.2rem 1.8rem;
+      text-align: center; opacity: 0; visibility: hidden; transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.55s;
+      z-index: 1;
+    }
+    .screen.active {
+      opacity: 1; visibility: visible; transform: translateY(0); z-index: 10;
+    }
+
+    /* ─── ロゴ ─── */
+    .logo-container {
+      display: flex; flex-direction: column; align-items: center; margin-bottom: 1.6rem;
+    }
+    .main-logo {
+      width: 76px; height: auto;
+      animation: float-cloud 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(226, 207, 124, 0.6))
+              drop-shadow(0 0 24px rgba(226, 207, 124, 0.3));
+      margin-bottom: 0.6rem;
+    }
+    .main-logotype {
+      width: 180px; height: auto;
+      filter: drop-shadow(0 0 8px rgba(226, 207, 124, 0.4));
+      margin-bottom: 0.4rem;
+    }
+    @keyframes float-cloud {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .brand-subtitle {
+      font-family: 'Nunito', 'Zen Maru Gothic', sans-serif;
+      font-size: 0.95rem; letter-spacing: 0.15em; color: var(--accent-color);
+      font-weight: 700; opacity: 0.9; padding-top: 0.4rem;
+    }
+
+    h1 {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-size: 1.9rem; color: var(--text-main); font-weight: 500;
+      margin: 0 0 1.4rem 0; line-height: 1.55; letter-spacing: 0.02em;
+    }
+    h1 .accent { color: var(--accent-color); }
+
+    p.lead {
+      font-size: 1rem; line-height: 1.95; margin: 0 auto 1rem;
+      color: var(--text-muted); max-width: 360px;
+    }
+    p.lead-note {
+      font-size: 0.84rem; line-height: 1.75; margin: 0 auto 2.4rem;
+      color: rgba(232, 230, 225, 0.4); max-width: 360px; letter-spacing: 0.03em;
+    }
+
+    .back-btn {
+      position: absolute; top: 0.6rem; left: 1rem;
+      background: none; border: none; color: rgba(255,255,255,0.55);
+      font-family: 'Zen Maru Gothic', sans-serif; font-size: 0.9rem;
+      cursor: pointer; display: inline-flex; align-items: center;
+      gap: 0.4rem; padding: 0.5rem 0.6rem; border-radius: 999px;
+      transition: color 0.3s, background-color 0.3s;
+    }
+    .back-btn:hover {
+      color: var(--accent-color); background-color: rgba(255,255,255,0.04);
+    }
+    .back-btn svg { width: 1.1em; height: 1.1em; fill: currentColor; }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-soft) 100%);
+      color: #1E2024; border: none; border-radius: 999px;
+      padding: 1.05rem 3rem; font-size: 1.05rem;
+      font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s, opacity 0.3s;
+      box-shadow: 0 8px 24px rgba(226, 207, 124, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      width: 100%; max-width: 320px; margin: 0.5rem auto; display: block; position: relative;
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 32px rgba(226, 207, 124, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+    .btn:active:not(:disabled) { transform: translateY(-1px); }
+    .btn:disabled {
+      background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.3);
+      cursor: not-allowed; box-shadow: none;
+    }
+    .btn.outline {
+      background: transparent; color: var(--text-main);
+      border: 1px solid rgba(255,255,255,0.22); box-shadow: none;
+    }
+    .btn.outline:hover {
+      background-color: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.4);
+    }
+
+    .input-field, select {
+      width: 100%; max-width: 320px; padding: 1rem 1.2rem;
+      border-radius: 14px; background-color: var(--tag-bg); color: white;
+      border: 1px solid var(--tag-border);
+      font-family: 'Zen Maru Gothic', sans-serif; font-size: 1.05rem;
+      outline: none; margin-bottom: 1.6rem; text-align: center;
+      transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s;
+    }
+    .input-field:focus, select:focus {
+      border-color: var(--accent-color);
+      background-color: rgba(226, 207, 124, 0.05);
+      box-shadow: 0 0 0 4px rgba(226, 207, 124, 0.08);
+    }
+    select {
+      cursor: pointer; appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23E2CF7C' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 1.2rem center;
+    }
+    select:focus {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23E2CF7C' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 1.2rem center;
+    }
+    select option { color: #312E33; }
+
+    .field-label {
+      font-size: 0.95rem; color: var(--text-muted);
+      margin-bottom: 0.6rem; letter-spacing: 0.04em;
+    }
+
+    .tags-container {
+      display: flex; flex-wrap: wrap; gap: 0.55rem;
+      justify-content: center; margin-bottom: 2rem;
+    }
+    .mood-tag {
+      padding: 0.55rem 1.15rem; border-radius: 999px;
+      background: var(--tag-bg); border: 1px solid var(--tag-border);
+      color: var(--text-main); cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+      font-size: 0.95rem; user-select: none;
+    }
+    .mood-tag:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-2px); }
+    .mood-tag.selected {
+      background: var(--accent-color); color: #1E2024;
+      border-color: var(--accent-color); font-weight: 700;
+      box-shadow: 0 6px 18px rgba(226, 207, 124, 0.35);
+    }
+
+    /* 🎵 BGM TOGGLE */
+    .bgm-toggle {
+      position: fixed;
+      top: max(14px, env(safe-area-inset-top));
+      right: max(14px, env(safe-area-inset-right));
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: rgba(20, 22, 28, 0.65);
+      border: 1px solid rgba(226, 207, 124, 0.3);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer;
+      z-index: 80;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent-color);
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+                  background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+      padding: 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    .bgm-toggle:hover {
+      border-color: rgba(226, 207, 124, 0.7);
+      background: rgba(20, 22, 28, 0.85);
+      transform: scale(1.06);
+    }
+    .bgm-toggle:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 3px;
+    }
+    .bgm-toggle.playing {
+      border-color: rgba(226, 207, 124, 0.6);
+      animation: bgm-pulse 3.2s ease-in-out infinite;
+    }
+    @keyframes bgm-pulse {
+      0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,0.3), 0 0 14px rgba(226, 207, 124, 0.18); }
+      50%      { box-shadow: 0 4px 14px rgba(0,0,0,0.3), 0 0 26px rgba(226, 207, 124, 0.42); }
+    }
+    .bgm-bars {
+      display: flex; align-items: center; justify-content: center;
+      gap: 2.5px; height: 16px; width: 22px;
+    }
+    .bgm-bars span {
+      display: block; width: 2.5px; background: currentColor;
+      border-radius: 1.5px; transition: height 0.4s ease;
+    }
+    .bgm-toggle:not(.playing) .bgm-bars span:nth-child(1) { height: 35%; }
+    .bgm-toggle:not(.playing) .bgm-bars span:nth-child(2) { height: 60%; }
+    .bgm-toggle:not(.playing) .bgm-bars span:nth-child(3) { height: 45%; }
+    .bgm-toggle:not(.playing) .bgm-bars span:nth-child(4) { height: 25%; }
+    .bgm-toggle:not(.playing)::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 28px; height: 1.5px; background: currentColor;
+      border-radius: 1px; transform: translate(-50%, -50%) rotate(-45deg);
+      opacity: 0.55; pointer-events: none;
+    }
+    .bgm-toggle.playing .bgm-bars span {
+      animation: bars-dance 1s ease-in-out infinite;
+    }
+    .bgm-toggle.playing .bgm-bars span:nth-child(1) { animation-delay: -0.3s; }
+    .bgm-toggle.playing .bgm-bars span:nth-child(2) { animation-delay: -0.7s; }
+    .bgm-toggle.playing .bgm-bars span:nth-child(3) { animation-delay: -0.1s; }
+    .bgm-toggle.playing .bgm-bars span:nth-child(4) { animation-delay: -0.5s; }
+    @keyframes bars-dance {
+      0%, 100% { height: 22%; }
+      50%      { height: 88%; }
+    }
+
+    /* 🔊 効果音ボタン */
+    .sfx-toggle {
+      position: fixed;
+      top: calc(max(14px, env(safe-area-inset-top)) + 46px + 6px);
+      right: max(14px, env(safe-area-inset-right));
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: rgba(20, 22, 28, 0.65);
+      border: 1px solid rgba(226, 207, 124, 0.3);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer;
+      z-index: 80;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent-color);
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+                  background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+      padding: 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    .sfx-toggle:hover {
+      border-color: rgba(226, 207, 124, 0.7);
+      background: rgba(20, 22, 28, 0.85);
+      transform: scale(1.06);
+    }
+    .sfx-toggle:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 3px;
+    }
+    .sfx-toggle.enabled {
+      border-color: rgba(226, 207, 124, 0.6);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3), 0 0 14px rgba(226, 207, 124, 0.18);
+    }
+    
+    /* 🔊 スピーカーアイコン (SVG) */
+    .sfx-icon {
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+    
+    /* OFF時：音波を非表示 + ミュート線を表示 */
+    .sfx-toggle:not(.enabled) .sfx-wave-1,
+    .sfx-toggle:not(.enabled) .sfx-wave-2 {
+      opacity: 0;
+    }
+    .sfx-toggle:not(.enabled) .sfx-icon {
+      opacity: 0.6;
+    }
+    .sfx-toggle:not(.enabled)::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 28px; height: 1.5px; background: currentColor;
+      border-radius: 1px; transform: translate(-50%, -50%) rotate(-45deg);
+      opacity: 0.7; pointer-events: none;
+    }
+    
+    /* ON時：音波を表示 */
+    .sfx-toggle.enabled .sfx-wave-1,
+    .sfx-toggle.enabled .sfx-wave-2 {
+      opacity: 1;
+    }
+    .bgm-hint {
+      position: absolute; inset: -4px; border-radius: 50%;
+      border: 1.5px solid rgba(226, 207, 124, 0.6);
+      animation: hint-ring 2.4s ease-out 1.2s 2 forwards;
+      pointer-events: none; opacity: 0;
+    }
+    @keyframes hint-ring {
+      0%   { transform: scale(0.85); opacity: 0; }
+      30%  { opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .bgm-toggle.playing .bgm-hint { display: none; }
+
+    /* 🎵 BGM チュートリアル */
+    .bgm-tutorial {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    
+    .bgm-tutorial.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .bgm-tutorial-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+    }
+    
+    .bgm-tutorial-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 520px;
+      background: rgba(20, 22, 28, 0.96);
+      color: #E2CF7C;
+      padding: 2rem 2.5rem;
+      border-radius: 16px;
+      text-align: center !important;
+      font-size: 1.15rem;
+      font-family: 'Zen Maru Gothic', sans-serif;
+      border: 1px solid rgba(226, 207, 124, 0.4);
+      z-index: 201;
+      line-height: 1.8;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+    
+    .bgm-tutorial-highlight {
+      position: fixed;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px #E2CF7C,
+                  0 0 30px rgba(226, 207, 124, 0.8),
+                  0 0 60px rgba(226, 207, 124, 0.5),
+                  inset 0 0 20px rgba(226, 207, 124, 0.3);
+      z-index: 202;
+      pointer-events: none;
+      animation: bgm-highlight-pulse 1.2s ease-in-out infinite;
+    }
+    
+    .sfx-tutorial-highlight {
+      position: fixed;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px #E2CF7C,
+                  0 0 30px rgba(226, 207, 124, 0.8),
+                  0 0 60px rgba(226, 207, 124, 0.5),
+                  inset 0 0 20px rgba(226, 207, 124, 0.3);
+      z-index: 202;
+      pointer-events: none;
+      animation: bgm-highlight-pulse 1.2s ease-in-out infinite;
+    }
+    
+    @keyframes bgm-highlight-pulse {
+      0%, 100% { 
+        box-shadow: 0 0 0 2px #E2CF7C,
+                    0 0 30px rgba(226, 207, 124, 0.8), 
+                    0 0 60px rgba(226, 207, 124, 0.5), 
+                    inset 0 0 20px rgba(226, 207, 124, 0.3); 
+      }
+      50% { 
+        box-shadow: 0 0 0 2px #E2CF7C,
+                    0 0 50px rgba(226, 207, 124, 1), 
+                    0 0 90px rgba(226, 207, 124, 0.7), 
+                    inset 0 0 30px rgba(226, 207, 124, 0.5); 
+      }
+    }
+
+    /* 🚂 LOADING */
+    .train-scene {
+      position: relative; width: 100%; max-width: 460px; height: 240px;
+      margin: 0 auto 2rem; border-radius: 20px; overflow: hidden;
+      background: linear-gradient(180deg, #0a0e1f 0%, #1a2240 40%, #2a3258 70%, #3d4670 100%);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45), inset 0 0 80px rgba(0,0,0,0.4);
+      transition: background 2s ease;
+    }
+    .moon {
+      position: absolute; top: 28px; right: 50px; width: 38px; height: 38px;
+      background: radial-gradient(circle at 35% 35%, #fff8e0, #f5deb3);
+      border-radius: 50%;
+      box-shadow: 0 0 30px rgba(255, 245, 214, 0.35), 0 0 60px rgba(255, 245, 214, 0.15);
+      transition: opacity 2s ease;
+    }
+    .moon::after {
+      content:''; position: absolute; top: 6px; left: 12px; width: 8px; height: 8px;
+      background: rgba(220, 200, 160, 0.4); border-radius: 50%;
+      box-shadow: 14px 10px 0 -2px rgba(220, 200, 160, 0.3);
+    }
+    .sun {
+      position: absolute; top: 22px; right: 50px;
+      width: 42px; height: 42px;
+      background: radial-gradient(circle at 40% 38%, #fffde0, #ffe566 50%, #ffb800);
+      border-radius: 50%;
+      box-shadow: 0 0 28px rgba(255,220,50,0.8), 
+                  0 0 55px rgba(255,200,0,0.45), 
+                  0 0 90px rgba(255,180,0,0.2);
+      opacity: 0;
+      transition: opacity 2s ease;
+      pointer-events: none;
+    }
+    .sun.visible {
+      opacity: 1;
+    }
+    .day-cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.92);
+      border-radius: 999px;
+      opacity: 0;
+      transition: opacity 2s ease;
+      pointer-events: none;
+    }
+    .day-clouds.visible .day-cloud {
+      opacity: 1;
+    }
+    .sunset-overlay {
+      position: absolute; 
+      inset: 0;
+      background: linear-gradient(180deg,
+        rgba(30,10,50,0) 0%,
+        rgba(200,80,20,0.22) 45%,
+        rgba(240,130,30,0.38) 75%,
+        rgba(255,180,60,0.25) 100%
+      );
+      opacity: 0;
+      transition: opacity 2s ease;
+      pointer-events: none;
+    }
+    .sunset-overlay.visible {
+      opacity: 1;
+    }
+    .rain-wrap {
+      position: absolute; 
+      inset: 0; 
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      pointer-events: none;
+      z-index: 4;
+    }
+    .rain-wrap.visible {
+      opacity: 1;
+    }
+    .raindrop {
+      position: absolute; 
+      top: -12px;
+      width: 1px;
+      background: rgba(180,210,255,0.6);
+      border-radius: 1px;
+      animation: rain-fall linear infinite;
+    }
+    @keyframes rain-fall {
+      0%   { transform: translateY(0) rotate(10deg); opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 0.65; }
+      100% { transform: translateY(260px) rotate(10deg); opacity: 0; }
+    }
+    .snow-wrap {
+      position: absolute; 
+      inset: 0; 
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      pointer-events: none;
+      z-index: 4;
+    }
+    .snow-wrap.visible {
+      opacity: 1;
+    }
+    .snowflake {
+      position: absolute; 
+      top: -6px;
+      background: rgba(255,255,255,0.88);
+      border-radius: 50%;
+      animation: snow-fall linear infinite;
+    }
+    @keyframes snow-fall {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.75; }
+      100% { transform: translateY(260px) translateX(18px); opacity: 0; }
+    }
+    .stars { position: absolute; inset: 0; pointer-events:none; transition: opacity 2s ease; }
+    .stars span {
+      position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%;
+      animation: twinkle 2.5s infinite ease-in-out;
+    }
+    @keyframes twinkle { 0%, 100% { opacity: 0.25; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1.2); } }
+    .shooting-star {
+      position: absolute; top: 40px; left: -50px; width: 60px; height: 1px;
+      background: linear-gradient(90deg, transparent, #fff, transparent);
+      animation: shoot 6s linear infinite; animation-delay: 3s;
+      transition: opacity 2s ease;
+    }
+    @keyframes shoot {
+      0% { transform: translate(0, 0) rotate(15deg); opacity: 0; }
+      5% { opacity: 1; }
+      20%, 100% { transform: translate(280px, 70px) rotate(15deg); opacity: 0; }
+    }
+    .mountains-far {
+      position: absolute; bottom: 70px; left: 0; width: 200%; height: 70px;
+      background: linear-gradient(135deg, #1a1f3a 50%, transparent 50%) 0 0 / 80px 70px,
+                  linear-gradient(225deg, #1a1f3a 50%, transparent 50%) 40px 0 / 80px 70px;
+      opacity: 0.7; animation: scroll-slow 32s linear infinite;
+    }
+    .hills {
+      position: absolute; bottom: 50px; left: 0; width: 200%; height: 50px;
+      animation: scroll-mid 14s linear infinite;
+    }
+    .hills svg { width: 100%; height: 100%; display: block; }
+    .poles {
+      position: absolute; bottom: 50px; left: 0; width: 200%; height: 80px;
+      animation: scroll-fast 4.5s linear infinite; pointer-events: none;
+    }
+    .pole { position: absolute; bottom: 0; width: 2px; height: 70px; background: #0a0a14; }
+    .pole::before { content: ''; position: absolute; top: 6px; left: -8px; width: 18px; height: 2px; background: #0a0a14; }
+    .pole::after  { content: ''; position: absolute; top: 14px; left: -6px; width: 14px; height: 2px; background: #0a0a14; }
+    .tracks {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 50px;
+      background: linear-gradient(180deg, #1a1c24 0%, #0a0c12 100%);
+    }
+    .rail { position: absolute; left: 0; width: 100%; height: 2px; background: rgba(150, 150, 170, 0.5); }
+    .rail.top { top: 14px; } .rail.bottom { top: 28px; background: rgba(180, 180, 200, 0.7); }
+    .sleepers {
+      position: absolute; bottom: 4px; left: 0; width: 200%; height: 12px;
+      background: repeating-linear-gradient(90deg, #2a2c38 0 14px, transparent 14px 32px);
+      animation: scroll-rail 0.8s linear infinite;
+    }
+    .train {
+      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+      animation: train-bob 0.45s ease-in-out infinite;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.55)); z-index: 5;
+    }
+    .train svg { display: block; }
+    .headlight-beam {
+      position: absolute; bottom: 38px; left: calc(50% + 88px); width: 100px; height: 30px;
+      background: linear-gradient(90deg, rgba(255, 245, 200, 0.45), rgba(255, 245, 200, 0.15) 60%, transparent);
+      clip-path: polygon(0 40%, 100% 0%, 100% 100%, 0 60%);
+      animation: beam-flicker 2.5s ease-in-out infinite; pointer-events: none;
+    }
+    @keyframes beam-flicker { 0%,100% { opacity: 0.85; } 50% { opacity: 1; } }
+    @keyframes train-bob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-1.5px); } }
+    @keyframes scroll-slow { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    @keyframes scroll-mid  { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    @keyframes scroll-fast { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    @keyframes scroll-rail { 0%{transform:translateX(0)} 100%{transform:translateX(-32px)} }
+
+    .loading-text {
+      font-size: 1.05rem; line-height: 1.9; min-height: 4em; color: var(--accent-soft);
+      letter-spacing: 0.04em; transition: opacity 0.5s ease; font-weight: 500;
+    }
+    .loading-dot {
+      display: inline-block; width: 5px; height: 5px; background: var(--accent-color);
+      border-radius: 50%; margin: 0 3px; animation: dot-bounce 1.2s infinite ease-in-out;
+    }
+    .loading-dot:nth-child(2) { animation-delay: 0.15s; } .loading-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes dot-bounce { 0%,80%,100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-5px); opacity: 1; } }
+
+    /* 🎟️ チケット */
+    .ticket-wrapper {
+      filter: drop-shadow(0 24px 40px rgba(0,0,0,0.55));
+      margin-bottom: 2rem;
+      animation: floatTicket 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      opacity: 0; transform: translateY(40px) rotate(-1.5deg);
+    }
+    @keyframes floatTicket { to { opacity: 1; transform: translateY(0) rotate(0); } }
+    .ticket {
+      background-color: var(--ticket-bg);
+      color: var(--ticket-text);
+      border-radius: 14px;
+      padding: 1.8rem 1.8rem 1.4rem;
+      position: relative;
+      text-align: left;
+      background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.012) 0 2px, transparent 2px 4px);
+      -webkit-mask-image: 
+        radial-gradient(circle at 0 60%, transparent 13px, black 13.5px),
+        radial-gradient(circle at 100% 60%, transparent 13px, black 13.5px);
+      -webkit-mask-composite: source-in;
+      mask-image: 
+        radial-gradient(circle at 0 60%, transparent 13px, black 13.5px),
+        radial-gradient(circle at 100% 60%, transparent 13px, black 13.5px);
+      mask-composite: intersect;
+    }
+    .ticket::before {
+      content: ''; position: absolute;
+      top: 12px; left: 12px; right: 12px; bottom: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 6px; pointer-events: none;
+    }
+    .ticket-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; }
+    .ticket-row + .ticket-row { margin-top: 1rem; }
+    .ticket-label {
+      font-family: 'Nunito', sans-serif; font-size: 0.68rem; color: #999;
+      letter-spacing: 0.18em; margin-bottom: 0.25rem; font-weight: 700; text-transform: uppercase;
+    }
+    .ticket-value { font-family: 'Nunito', 'Zen Maru Gothic', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--ticket-text); }
+    .zen-maru-text { font-family: 'Zen Maru Gothic', sans-serif; font-size: 1.3rem; color: var(--ticket-text); font-weight: 700; }
+    .ticket-body { padding: 1.3rem 0; margin-top: 1.2rem; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1.5px dashed rgba(0,0,0,0.2); }
+    .ticket-title { font-family: 'Nunito', 'Zen Maru Gothic', sans-serif; font-size: 1.55rem; font-weight: 700; margin: 0.3rem 0 0.4rem; line-height: 1.35; letter-spacing: 0.01em; }
+    .ticket-artist { font-family: 'Nunito', 'Zen Maru Gothic', sans-serif; color: #6a6a6a; font-size: 1rem; font-weight: 600; }
+    .ai-comment { font-size: 0.95rem; line-height: 1.85; padding-top: 1.2rem; color: #444; font-family: 'Zen Maru Gothic', sans-serif; }
+    .barcode {
+      height: 28px; margin-top: 1.3rem;
+      background: repeating-linear-gradient(90deg, var(--ticket-text) 0 2px, transparent 2px 4px, var(--ticket-text) 4px 5px, transparent 5px 9px, var(--ticket-text) 9px 12px, transparent 12px 14px);
+      opacity: 0.75;
+    }
+    .ticket-stamp {
+      position: absolute; top: 14px; right: 14px; width: 56px; height: 56px;
+      border: 2px solid rgba(180, 60, 60, 0.5); border-radius: 50%; color: rgba(180, 60, 60, 0.65);
+      font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
+      transform: rotate(-12deg); letter-spacing: 0.05em; line-height: 1.2; text-align: center;
+    }
+    .apple-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem; margin-top: -3px; }
+
+    /* How it works */
+    .how-it-works {
+      margin: 0 auto 2.2rem; max-width: 380px; display: flex; flex-direction: column; gap: 0.85rem;
+      padding: 1.4rem 1.2rem; background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px; text-align: left; position: relative;
+    }
+    .how-title { font-family: 'Zen Maru Gothic', sans-serif; font-size: 0.92rem; letter-spacing: 0.3em; color: var(--accent-color); font-weight: 700; text-align: center; margin-bottom: 0.4rem; opacity: 0.85; }
+    .step { display: flex; align-items: center; gap: 0.95rem; }
+    .step-number { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: rgba(226, 207, 124, 0.1); border: 1px solid rgba(226, 207, 124, 0.45); color: var(--accent-color); font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(226, 207, 124, 0.12); }
+    .step-text { font-size: 0.92rem; color: rgba(232, 230, 225, 0.82); line-height: 1.55; }
+    .step-text strong { color: var(--accent-color); font-weight: 700; }
+
+    .btn .icon { width: 17px; height: 17px; vertical-align: middle; margin-right: 0.5rem; margin-top: -3px; }
+
+    .toast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(160%);
+      background: rgba(20, 22, 26, 0.96); color: var(--accent-color); padding: 0.9rem 1.6rem;
+      border-radius: 999px; font-size: 0.95rem; border: 1px solid rgba(226, 207, 124, 0.3);
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); z-index: 100; pointer-events: none;
+      backdrop-filter: blur(10px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); max-width: 90vw; text-align: center;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* 📱 RESPONSIVE */
+    @media (max-width: 480px) {
+      .screen { padding: 1.7rem 1.2rem; }
+      h1 { font-size: 1.55rem; line-height: 1.5; }
+      p.lead { font-size: 0.93rem; line-height: 1.85; }
+      p.lead-note { font-size: 0.8rem; }
+      .how-title { font-size: 0.86rem; letter-spacing: 0.3em; }
+      .train-scene { height: 200px; }
+      .ticket { padding: 1.5rem 1.4rem 1.2rem; }
+      .ticket-title { font-size: 1.32rem; }
+      .ticket-stamp { width: 48px; height: 48px; font-size: 0.62rem; top: 10px; right: 10px; }
+      .how-it-works { padding: 1.1rem 0.95rem; }
+      .step-text { font-size: 0.86rem; }
+      .step-number { width: 24px; height: 24px; font-size: 0.78rem; }
+      .btn { padding: 0.95rem 2rem; font-size: 0.98rem; }
+      .mood-tag { padding: 0.48rem 0.95rem; font-size: 0.88rem; }
+      .main-logo { width: 64px; }
+      .main-logotype { width: 150px; }
+      .brand-subtitle { font-size: 0.85rem; }
+      .moon { width: 30px; height: 30px; top: 22px; right: 36px; }
+      .train svg { width: 150px; height: 67px; }
+      .headlight-beam { left: calc(50% + 74px); width: 80px; }
+      .bgm-toggle { width: 42px; height: 42px; }
+      .sfx-toggle { width: 42px; height: 42px; }
+      .bgm-tutorial-message { font-size: 0.95rem; padding: 1.5rem 1.8rem; }
+    }
+    @media (max-width: 360px) {
+      h1 { font-size: 1.4rem; }
+      p.lead { font-size: 0.88rem; }
+      .train-scene { height: 175px; }
+      .ticket-title { font-size: 1.18rem; }
+      .zen-maru-text { font-size: 1.1rem; }
+      .train svg { width: 130px; height: 58px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .main-logo, .ambient-particles span, .stars span, .shooting-star,
+      .mountains-far, .hills, .poles, .sleepers, .train,
+      .bgm-toggle.playing, .bgm-toggle.playing .bgm-bars span,
+      .bgm-hint { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <button id="bgm-toggle" class="bgm-toggle" onclick="toggleBGM()" aria-label="BGMの再生切り替え" title="BGM">
+    <div class="bgm-bars" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <span class="bgm-hint" aria-hidden="true"></span>
+  </button>
+
+  <!-- 🔊 効果音トグル -->
+  <button id="sfx-toggle" class="sfx-toggle enabled" onclick="toggleSFX()" aria-label="効果音の切り替え" title="SFX">
+    <svg class="sfx-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+      <path class="sfx-wave-1" d="M15.5 8.5a5 5 0 0 1 0 7"/>
+      <path class="sfx-wave-2" d="M19 5a9 9 0 0 1 0 14"/>
+    </svg>
+  </button>
+
+  <!-- 🎵 BGM チュートリアル -->
+  <div id="bgm-tutorial" class="bgm-tutorial">
+    <div class="bgm-tutorial-overlay"></div>
+    <div class="bgm-tutorial-message">右上のボタンをタップして<br>BGMを再生できます</div>
+    <div class="bgm-tutorial-highlight"></div>
+  </div>
+
+  <!-- 🔊 効果音チュートリアル -->
+  <div id="sfx-tutorial" class="bgm-tutorial">
+    <div class="bgm-tutorial-overlay"></div>
+    <div class="bgm-tutorial-message">その下のボタンで<br>効果音をオフにできます</div>
+    <div class="sfx-tutorial-highlight"></div>
+  </div>
+
+  <div class="ambient-particles" id="ambient"></div>
+
+  <div id="screen-top" class="screen active">
+    <div class="logo-container">
+      <img src="img/logo.svg" alt="CAELO Icon" class="main-logo">
+      <img src="img/logotyp.svg" alt="CAELO" class="main-logotype">
+      <div class="brand-subtitle">- 音楽で帰ろう -</div>
+    </div>
+
+    <h1>あなたとふるさとをつなぐ、<br><span class="accent">ちょっとした帰省</span>を。</h1>
+    <p class="lead">今の気分と、ふるさとの空模様をつないで、<br>音楽で数分間だけの「心の帰省」をしませんか？</p>
+    <p class="lead-note">※ 変わらずふるさとで暮らしている方も、<br>安心して「心の帰省」をお楽しみください。</p>
+
+    <div class="how-it-works">
+      <div class="how-title">— CAELOの楽しみ方 —</div>
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-text">あなたの<strong>今の気分</strong>を選んでください</div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-text"><strong>ふるさとの今の空模様</strong>を呼び出します</div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-text">AIが2つをつなぐ<strong>1曲</strong>を選び、<br><strong>切符</strong>にしてあなたへ届けます</div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="navTo('screen-mood')">帰省する</button>
+  </div>
+
+  <div id="screen-mood" class="screen">
+    <button class="back-btn" onclick="navTo('screen-top')">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path fill="currentColor" d="M17.08,22.48c-.24,0-.49-.09-.68-.27L6.24,12.73c-.2-.19-.32-.45-.32-.73s.12-.54.32-.73L16.4,1.79c.41-.38,1.04-.35,1.41.05.38.4.35,1.04-.05,1.41l-8.75,8.17c-.34.32-.34.86,0,1.17l8.75,8.16c.4.38.43,1.01.05,1.41-.2.21-.46.32-.73.32Z"/>
+      </svg>
+      戻る
+    </button>
+    <div style="margin-top: 2.4rem;"></div>
+    <div class="field-label">切符に印字するお名前</div>
+    <input type="text" id="nickname-input" class="input-field" placeholder="ニックネームを入力" oninput="checkMood()" maxlength="16">
+    <h1 style="margin-top: 0.6rem; font-size: 1.35rem;">今の気分は？</h1>
+    <div class="tags-container" id="tags-mood"></div>
+    <button class="btn" id="btn-next-mood" onclick="navTo('screen-hometown')" disabled>次へ</button>
+  </div>
+
+  <div id="screen-hometown" class="screen">
+    <button class="back-btn" onclick="navTo('screen-mood')">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path fill="currentColor" d="M17.08,22.48c-.24,0-.49-.09-.68-.27L6.24,12.73c-.2-.19-.32-.45-.32-.73s.12-.54.32-.73L16.4,1.79c.41-.38,1.04-.35,1.41.05.38.4.35,1.04-.05,1.41l-8.75,8.17c-.34.32-.34.86,0,1.17l8.75,8.16c.4.38.43,1.01.05,1.41-.2.21-.46.32-.73.32Z"/>
+      </svg>
+      戻る
+    </button>
+    <div style="margin-top: 2.4rem;"></div>
+    <h1>あなたの帰りたい場所は？</h1>
+    <p class="lead" style="margin-bottom: 2.4rem;">ふるさとの今の空模様を調べます</p>
+    <select id="pref-select" onchange="checkPref()">
+      <option value="" disabled selected>都道府県を選択してください</option>
+      <option value="43.0641,141.3469,北海道">北海道</option>
+      <option value="40.8244,140.7400,青森県">青森県</option>
+      <option value="39.7036,141.1525,岩手県">岩手県</option>
+      <option value="38.2688,140.8721,宮城県">宮城県</option>
+      <option value="39.7186,140.1025,秋田県">秋田県</option>
+      <option value="38.2404,140.3633,山形県">山形県</option>
+      <option value="37.7500,140.4678,福島県">福島県</option>
+      <option value="36.3418,140.4468,茨城県">茨城県</option>
+      <option value="36.5658,139.8836,栃木県">栃木県</option>
+      <option value="36.3911,139.0608,群馬県">群馬県</option>
+      <option value="35.8572,139.6490,埼玉県">埼玉県</option>
+      <option value="35.6051,140.1233,千葉県">千葉県</option>
+      <option value="35.6894,139.6917,東京都">東京都</option>
+      <option value="35.4475,139.6425,神奈川県">神奈川県</option>
+      <option value="37.9022,139.0236,新潟県">新潟県</option>
+      <option value="36.6953,137.2113,富山県">富山県</option>
+      <option value="36.5947,136.6256,石川県">石川県</option>
+      <option value="36.0652,136.2219,福井県">福井県</option>
+      <option value="35.6638,138.5683,山梨県">山梨県</option>
+      <option value="36.6513,138.1810,長野県">長野県</option>
+      <option value="35.3912,136.7222,岐阜県">岐阜県</option>
+      <option value="34.9769,138.3831,静岡県">静岡県</option>
+      <option value="35.1802,136.9066,愛知県">愛知県</option>
+      <option value="34.7303,136.5086,三重県">三重県</option>
+      <option value="35.0045,135.8686,滋賀県">滋賀県</option>
+      <option value="35.0212,135.7538,京都府">京都府</option>
+      <option value="34.6862,135.5200,大阪府">大阪府</option>
+      <option value="34.6913,135.1830,兵庫県">兵庫県</option>
+      <option value="34.6853,135.8327,奈良県">奈良県</option>
+      <option value="34.2260,135.1675,和歌山県">和歌山県</option>
+      <option value="35.5036,134.2383,鳥取県">鳥取県</option>
+      <option value="35.4723,133.0505,島根県">島根県</option>
+      <option value="34.6617,133.9350,岡山県">岡山県</option>
+      <option value="34.3963,132.4594,広島県">広島県</option>
+      <option value="34.1858,131.4714,山口県">山口県</option>
+      <option value="34.0658,134.5594,徳島県">徳島県</option>
+      <option value="34.3401,134.0433,香川県">香川県</option>
+      <option value="33.8416,132.7661,愛媛県">愛媛県</option>
+      <option value="33.5597,133.5311,高知県">高知県</option>
+      <option value="33.6064,130.4183,福岡県">福岡県</option>
+      <option value="33.2635,130.3009,佐賀県">佐賀県</option>
+      <option value="32.7448,129.8736,長崎県">長崎県</option>
+      <option value="32.7898,130.7417,熊本県">熊本県</option>
+      <option value="33.2382,131.6125,大分県">大分県</option>
+      <option value="31.9077,131.4202,宮崎県">宮崎県</option>
+      <option value="31.5602,130.5581,鹿児島県">鹿児島県</option>
+      <option value="26.2123,127.6809,沖縄県">沖縄県</option>
+    </select>
+    <button class="btn" id="btn-next-pref" onclick="startHomecoming()" disabled>音楽を探す</button>
+  </div>
+
+  <div id="screen-loading" class="screen">
+    <div class="train-scene" aria-label="走る電車のアニメーション">
+      <div class="moon"></div>
+      <div class="stars" id="stars"></div>
+      <div class="shooting-star"></div>
+      <div class="sun" id="train-sun"></div>
+  
+      <div class="day-clouds" id="train-clouds">
+        <div class="day-cloud" style="width:72px;height:28px;top:30px;left:20px;"></div>
+        <div class="day-cloud" style="width:50px;height:20px;top:22px;left:78px;"></div>
+        <div class="day-cloud" style="width:88px;height:30px;top:36px;left:150px;"></div>
+        <div class="day-cloud" style="width:58px;height:22px;top:26px;left:270px;"></div>
+      </div>
+  
+      <div class="sunset-overlay" id="train-sunset"></div>
+      <div class="rain-wrap" id="train-rain"></div>
+      <div class="snow-wrap" id="train-snow"></div>
+
+      <div class="mountains-far"></div>
+      <div class="hills">
+        <svg viewBox="0 0 800 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 50 L0 30 Q40 14 80 22 Q120 30 160 18 Q210 6 260 22 Q310 36 360 24 Q400 14 450 26 Q500 38 560 22 Q610 10 670 24 Q730 38 800 26 L800 50 Z" fill="#0d1124"/>
+          <path d="M800 50 L800 30 Q840 14 880 22 Q920 30 960 18 Q1010 6 1060 22 Q1110 36 1160 24 Q1200 14 1250 26 Q1300 38 1360 22 Q1410 10 1470 24 Q1530 38 1600 26 L1600 50 Z" fill="#0d1124" transform="translate(0,0)"/>
+        </svg>
+      </div>
+      <div class="poles" id="poles"></div>
+      <div class="tracks">
+        <div class="rail top"></div>
+        <div class="rail bottom"></div>
+        <div class="sleepers"></div>
+      </div>
+      <div class="headlight-beam"></div>
+      <div class="train">
+        <svg width="180" height="80" viewBox="0 0 180 80" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="90" cy="74" rx="80" ry="3" fill="rgba(0,0,0,0.35)"/>
+          <path id="train-body" d="M14 28 Q14 22 20 22 L148 22 Q160 22 168 32 L168 60 Q168 64 164 64 L18 64 Q14 64 14 60 Z" fill="#c45a3e" stroke="#7f3622" stroke-width="1.2"/>
+          <rect id="train-stripe" x="14" y="36" width="154" height="9" fill="#f5e6d3"/>
+          <rect x="14" y="36" width="154" height="1.5" fill="#e8d4ba"/>
+          <path id="train-top" d="M16 22 L150 22 Q158 22 164 28 L164 26 Q160 20 152 20 L18 20 Q15 20 15 22 Z" fill="#8a3a25"/>
+          <path d="M150 26 Q158 26 162 32 L162 35 L150 35 Z" fill="#1a2438" stroke="#7f3622" stroke-width="0.8"/>
+          <path d="M151 27 Q157 27 161 32 L154 32 Z" fill="rgba(255,255,255,0.15)"/>
+          <g fill="#3a5a78" stroke="#1a2438" stroke-width="0.5">
+            <rect x="22" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="40" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="58" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="76" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="94" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="112" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="130" y="26" width="14" height="9" rx="1.5"/>
+          </g>
+          <g fill="#f5d68a" opacity="0.55">
+            <rect x="22" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="58" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="94" y="26" width="14" height="9" rx="1.5"/>
+            <rect x="130" y="26" width="14" height="9" rx="1.5"/>
+          </g>
+          <circle cx="29" cy="32" r="2" fill="#7f3622" opacity="0.5"/>
+          <circle cx="65" cy="32" r="2" fill="#7f3622" opacity="0.5"/>
+          <circle cx="101" cy="32" r="2" fill="#7f3622" opacity="0.5"/>
+          <rect x="46" y="46" width="6" height="18" fill="#7f3622"/>
+          <rect x="106" y="46" width="6" height="18" fill="#7f3622"/>
+          <line x1="49" y1="48" x2="49" y2="62" stroke="#5a2718" stroke-width="0.5"/>
+          <line x1="109" y1="48" x2="109" y2="62" stroke="#5a2718" stroke-width="0.5"/>
+          <circle cx="164" cy="50" r="2.5" fill="#fff5d6"/>
+          <circle cx="164" cy="50" r="1.5" fill="#fff"/>
+          <rect x="120" y="46" width="20" height="6" rx="1" fill="#1a1a1a"/>
+          <text x="130" y="51" font-family="Nunito" font-size="4" fill="#f5d68a" text-anchor="middle" font-weight="700">HOME</text>
+          <rect x="10" y="48" width="6" height="14" fill="#1a1a1a"/>
+          <g class="wheels">
+            <g transform="translate(35,68)"><circle r="7" fill="#1a1a1a"/><circle r="4.5" fill="#444"/><line x1="-4.5" y1="0" x2="4.5" y2="0" stroke="#888" stroke-width="0.7"/><line x1="0" y1="-4.5" x2="0" y2="4.5" stroke="#888" stroke-width="0.7"/></g>
+            <g transform="translate(60,68)"><circle r="7" fill="#1a1a1a"/><circle r="4.5" fill="#444"/><line x1="-4.5" y1="0" x2="4.5" y2="0" stroke="#888" stroke-width="0.7"/><line x1="0" y1="-4.5" x2="0" y2="4.5" stroke="#888" stroke-width="0.7"/></g>
+            <g transform="translate(120,68)"><circle r="7" fill="#1a1a1a"/><circle r="4.5" fill="#444"/><line x1="-4.5" y1="0" x2="4.5" y2="0" stroke="#888" stroke-width="0.7"/><line x1="0" y1="-4.5" x2="0" y2="4.5" stroke="#888" stroke-width="0.7"/></g>
+            <g transform="translate(145,68)"><circle r="7" fill="#1a1a1a"/><circle r="4.5" fill="#444"/><line x1="-4.5" y1="0" x2="4.5" y2="0" stroke="#888" stroke-width="0.7"/><line x1="0" y1="-4.5" x2="0" y2="4.5" stroke="#888" stroke-width="0.7"/></g>
+          </g>
+          <g stroke="#1a1a1a" stroke-width="1" fill="none">
+            <line x1="80" y1="20" x2="80" y2="13"/>
+            <line x1="80" y1="13" x2="72" y2="8"/>
+            <line x1="80" y1="13" x2="88" y2="8"/>
+            <line x1="68" y1="8" x2="92" y2="8" stroke-width="1.2"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="loading-text" id="loading-text">
+      出発の準備をしています
+      <span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>
+    </div>
+  </div>
+
+  <div id="screen-result" class="screen">
+    <div class="ticket-wrapper">
+      <div class="ticket">
+        <div class="ticket-stamp">帰省<br>確認済</div>
+
+        <div class="ticket-row">
+          <div>
+            <div class="ticket-label">PASSENGER</div>
+            <div class="ticket-value" id="ticket-name">--</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="ticket-label">DESTINATION</div>
+            <div class="zen-maru-text" id="ticket-dest">--</div>
+          </div>
+        </div>
+
+        <div class="ticket-row">
+          <div>
+            <div class="ticket-label">WEATHER</div>
+            <div class="zen-maru-text" id="ticket-weather" style="font-size: 1.05rem;">--</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="ticket-label">DEPARTURE</div>
+            <div class="ticket-value" id="ticket-time">--</div>
+          </div>
+        </div>
+
+        <div class="ticket-body">
+          <div class="ticket-label">SOUNDTRACK</div>
+          <h2 class="ticket-title" id="result-title">Loading...</h2>
+          <p class="ticket-artist" id="result-artist">Loading...</p>
+        </div>
+        <div class="ai-comment" id="result-comment">
+          AIが手紙を書いています...
+        </div>
+
+        <div class="barcode"></div>
+      </div>
+    </div>
+    <button class="btn" id="apple-music-btn" onclick="openAppleMusic()">
+      <svg class="apple-icon" viewBox="0 0 384 512" fill="currentColor"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+      Apple Musicで聴く
+    </button>
+    <button class="btn" id="share-btn" style="margin-top: 0.8rem;" onclick="shareTicket()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      切符をシェア
+    </button>
+    
+    <button class="btn outline" style="margin-top: 0.8rem;" onclick="restartJourney(this)">もう一度帰る</button>
+
+  </div>
+
+  <div class="toast" id="toast">画像を保存しました</div>
+
+  <script>
+    // APIキーはVercel環境変数で管理（/api/chat経由）
+
+    let currentAppleMusicUrl = '';
+
+    const moods = [
+      '嬉しい', '楽しい！', '泣きたい', '懐かしい', '限界…',
+      '誰かに会いたい', 'ホッとしたい', 'エモい', '現実逃避したい',
+      '元気をもらいたい', '温もりを感じたい', '感傷に浸りたい',
+      'リフレッシュしたい', '一人になりたい', '過去に戻りたい',
+      '優しくされたい', 'ぼーっとしたい', '恋したい...', '少し疲れた', '思い出に浸りたい',
+    ];
+
+    const tagsContainer = document.getElementById('tags-mood');
+    const btnNextMood   = document.getElementById('btn-next-mood');
+    const nicknameInput = document.getElementById('nickname-input');
+
+    moods.forEach(mood => {
+      const div = document.createElement('div');
+      div.className = 'mood-tag';
+      div.innerText = mood;
+      div.onclick = () => {
+        const willBeSelected = !div.classList.contains('selected');
+        div.classList.toggle('selected');
+        checkMood();
+        if (willBeSelected) sfx.playTagOn();
+        else sfx.playTagOff();
+      };
+      tagsContainer.appendChild(div);
+    });
+
+    function checkMood() {
+      const selectedCount = document.querySelectorAll('.mood-tag.selected').length;
+      const hasName = nicknameInput.value.trim().length > 0;
+      btnNextMood.disabled = (selectedCount === 0 || !hasName);
+    }
+    function checkPref() {
+      const prefValue = document.getElementById('pref-select').value;
+      document.getElementById('btn-next-pref').disabled = !prefValue;
+    }
+    function navTo(targetId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(targetId).classList.add('active');
+    }
+
+    let _sharedAudioCtx = null;
+    function getOrCreateAudioCtx() {
+      if (_sharedAudioCtx) return _sharedAudioCtx;
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      try { _sharedAudioCtx = new Ctx(); } catch(e) { return null; }
+      return _sharedAudioCtx;
+    }
+
+    // 🎵 BGM チュートリアル表示
+    function positionHighlight(highlightEl, buttonEl, overlayEl) {
+      const rect = buttonEl.getBoundingClientRect();
+      highlightEl.style.top    = rect.top + 'px';
+      highlightEl.style.left   = rect.left + 'px';
+      highlightEl.style.width  = rect.width + 'px';
+      highlightEl.style.height = rect.height + 'px';
+      highlightEl.style.right  = 'auto';
+
+      // ボタンの中心座標と半径
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top  + rect.height / 2;
+      const r  = rect.width / 2;
+
+      // オーバーレイにボタン部分だけ穴を開ける
+      overlayEl.style.background = `radial-gradient(circle ${r}px at ${cx}px ${cy}px, transparent ${r}px, rgba(0,0,0,0.78) ${r + 1}px)`;
+    }
+
+    function showBGMTutorial() {
+      // 1回目のみ表示
+      if (localStorage.getItem('bgmTutorialShown')) {
+        // BGM チュートリアル既に見てたら、SFX も確認
+        showSFXTutorial();
+        return;
+      }
+      
+      const tutorial = document.getElementById('bgm-tutorial');
+      if (!tutorial) return;
+      
+      tutorial.classList.add('show');
+      positionHighlight(
+        tutorial.querySelector('.bgm-tutorial-highlight'),
+        document.getElementById('bgm-toggle'),
+        tutorial.querySelector('.bgm-tutorial-overlay')
+      );
+      
+      // 3秒後に自動消去
+      setTimeout(() => {
+        tutorial.classList.remove('show');
+        localStorage.setItem('bgmTutorialShown', 'true');
+        
+        // BGM チュートリアル消去後、効果音チュートリアルを表示
+        setTimeout(showSFXTutorial, 500);
+      }, 4000);
+    }
+
+    // 🔊 効果音チュートリアル表示
+    function showSFXTutorial() {
+      // 1回目のみ表示
+      if (localStorage.getItem('sfxTutorialShown')) return;
+      
+      const tutorial = document.getElementById('sfx-tutorial');
+      if (!tutorial) return;
+      
+      tutorial.classList.add('show');
+      positionHighlight(
+        tutorial.querySelector('.sfx-tutorial-highlight'),
+        document.getElementById('sfx-toggle'),
+        tutorial.querySelector('.bgm-tutorial-overlay')
+      );
+      
+      // 3秒後に自動消去
+      setTimeout(() => {
+        tutorial.classList.remove('show');
+        localStorage.setItem('sfxTutorialShown', 'true');
+      }, 3000);
+    }
+
+    // ページロード時に実行
+    window.addEventListener('load', () => {
+      setTimeout(showBGMTutorial, 600);
+    });
+
+    class AmbientPad {
+      constructor() {
+        this.ctx = null; this.master = null; this.nodes = [];
+        this.playing = false; this.targetGain = 0.16;
+      }
+      _init() {
+        if (this.ctx) return true;
+        this.ctx = getOrCreateAudioCtx();
+        if (!this.ctx) return false;
+
+        this.master = this.ctx.createGain();
+        this.master.gain.value = 0;
+
+        const lp = this.ctx.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 1800; lp.Q.value = 0.5;
+        this.master.connect(lp);
+        lp.connect(this.ctx.destination);
+
+        const notes = [
+          { freq: 130.81, gain: 0.18 },
+          { freq: 196.00, gain: 0.13 },
+          { freq: 246.94, gain: 0.10 },
+          { freq: 329.63, gain: 0.08 },
+          { freq: 392.00, gain: 0.06 },
+        ];
+        notes.forEach((note, i) => {
+          [0, 6].forEach((cents, j) => {
+            const osc = this.ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = note.freq * Math.pow(2, cents / 1200);
+            const gain = this.ctx.createGain();
+            gain.gain.value = note.gain * (j === 0 ? 1 : 0.6);
+            const vibLfo = this.ctx.createOscillator();
+            vibLfo.type = 'sine';
+            vibLfo.frequency.value = 0.08 + i * 0.025;
+            const vibGain = this.ctx.createGain();
+            vibGain.gain.value = note.freq * 0.0015;
+            vibLfo.connect(vibGain); vibGain.connect(osc.frequency);
+            const tremLfo = this.ctx.createOscillator();
+            tremLfo.type = 'sine';
+            tremLfo.frequency.value = 0.04 + i * 0.013 + j * 0.007;
+            const tremGain = this.ctx.createGain();
+            tremGain.gain.value = note.gain * 0.4;
+            tremLfo.connect(tremGain); tremGain.connect(gain.gain);
+            osc.connect(gain); gain.connect(this.master);
+            osc.start(); vibLfo.start(); tremLfo.start();
+            this.nodes.push(osc, vibLfo, tremLfo);
+          });
+        });
+        return true;
+      }
+      async play() {
+        if (!this._init()) return false;
+        if (this.ctx.state === 'suspended') await this.ctx.resume();
+        const now = this.ctx.currentTime;
+        this.master.gain.cancelScheduledValues(now);
+        this.master.gain.setValueAtTime(this.master.gain.value, now);
+        this.master.gain.linearRampToValueAtTime(this.targetGain, now + 1.8);
+        this.playing = true;
+        return true;
+      }
+      stop() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        this.master.gain.cancelScheduledValues(now);
+        this.master.gain.setValueAtTime(this.master.gain.value, now);
+        this.master.gain.linearRampToValueAtTime(0, now + 1.0);
+        this.playing = false;
+      }
+      async toggle() {
+        if (this.playing) this.stop();
+        else await this.play();
+        return this.playing;
+      }
+    }
+
+    class SoundFx {
+      constructor() {
+        this.tagOnFreqs = [523.25, 659.25, 783.99, 987.77, 1174.66];
+        this.tagOffFreq = 392.00;
+        this.mainFreq   = 523.25;
+        this.specialFreq = 1174.66;
+        this._lastTagOnFreq = null;
+        this.enabled = true;  // 効果音の有効/無効
+      }
+
+      _ctx() { return getOrCreateAudioCtx(); }
+
+      _playBell(freq, opts = {}) {
+        if (!this.enabled) return;  // 効果音がOFFなら何もしない
+        
+        const ctx = this._ctx();
+        if (!ctx) return;
+        if (ctx.state === 'suspended') ctx.resume();
+
+        const now = ctx.currentTime;
+        const dur         = opts.duration ?? 1.5;
+        const peak        = opts.gain     ?? 0.16;
+        const detune      = opts.detune   ?? 7;
+        const subOctave   = opts.subOctave ?? false;
+        const fifthGain   = opts.fifth    ?? 0.14;
+        const attack      = opts.attack   ?? 0.025;
+
+        const env = ctx.createGain();
+        env.gain.setValueAtTime(0.0001, now);
+        env.gain.exponentialRampToValueAtTime(peak, now + attack);
+        env.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = Math.min(freq * 6, 3200);
+        lp.Q.value = 0.6;
+
+        env.connect(lp);
+        lp.connect(ctx.destination);
+
+        const startOsc = (frequency, amp) => {
+          const osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = frequency;
+          const g = ctx.createGain();
+          g.gain.value = amp;
+          osc.connect(g); g.connect(env);
+          osc.start(now);
+          osc.stop(now + dur + 0.15);
+        };
+
+        startOsc(freq, 1.0);
+        startOsc(freq * Math.pow(2, detune / 1200), 0.55);
+
+        if (fifthGain > 0) startOsc(freq * 1.5, fifthGain);
+
+        if (subOctave) startOsc(freq / 2, 0.55);
+      }
+
+      playTagOn() {
+        let freq;
+        do {
+          freq = this.tagOnFreqs[Math.floor(Math.random() * this.tagOnFreqs.length)];
+        } while (freq === this._lastTagOnFreq && this.tagOnFreqs.length > 1);
+        this._lastTagOnFreq = freq;
+
+        this._playBell(freq, {
+          duration: 1.4,
+          gain: 0.14,
+          detune: 8,
+          fifth: 0.10,
+          attack: 0.018
+        });
+      }
+
+      playTagOff() {
+        this._playBell(this.tagOffFreq, {
+          duration: 1.6,
+          gain: 0.12,
+          detune: 6,
+          fifth: 0.08,
+          attack: 0.025
+        });
+      }
+
+      playButton() {
+        this._playBell(this.mainFreq, {
+          duration: 2.0,
+          gain: 0.16,
+          detune: 9,
+          fifth: 0.13,
+          subOctave: false,
+          attack: 0.03
+        });
+      }
+
+      playButtonSpecial() {
+        this._playBell(this.specialFreq, {
+          duration: 1.8,
+          gain: 0.17,
+          detune: 10,
+          fifth: 0.15,
+          subOctave: false,
+          attack: 0.02
+        });
+      }
+    }
+
+    const bgm = new AmbientPad();
+    const sfx = new SoundFx();
+
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('.btn, .back-btn');
+      if (!target) return;
+      if (target.id === 'bgm-toggle') return;
+      if (target.disabled) return;
+      
+      if (target.id === 'btn-next-pref') {
+        sfx.playButtonSpecial();
+      } else {
+        sfx.playButton();
+      }
+    }, true);
+
+    async function toggleBGM() {
+      const bgmBtn = document.getElementById('bgm-toggle');
+      try {
+        await bgm.toggle();
+        if (bgm.playing) {
+          bgmBtn.classList.remove('muted');
+          bgmBtn.classList.add('playing');
+          const hint = bgmBtn.querySelector('.bgm-hint');
+          if (hint) hint.remove();
+        } else {
+          bgmBtn.classList.add('muted');
+          bgmBtn.classList.remove('playing');
+        }
+      } catch (e) {
+        console.warn('BGMの自動再生がブラウザにブロックされました', e);
+      }
+    }
+
+    function toggleSFX() {
+      sfx.enabled = !sfx.enabled;
+      const sfxBtn = document.getElementById('sfx-toggle');
+      if (sfx.enabled) {
+        sfxBtn.classList.add('enabled');
+        sfx.playButton();  // 有効化時に音を鳴らす
+      } else {
+        sfxBtn.classList.remove('enabled');
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!bgm.ctx || !bgm.playing) return;
+      const now = bgm.ctx.currentTime;
+      if (document.hidden) {
+        bgm.master.gain.cancelScheduledValues(now);
+        bgm.master.gain.linearRampToValueAtTime(0, now + 0.3);
+      } else {
+        bgm.master.gain.cancelScheduledValues(now);
+        bgm.master.gain.linearRampToValueAtTime(bgm.targetGain, now + 0.6);
+      }
+    });
+
+    const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+    async function restartJourney(btnElement) {
+      btnElement.innerText = '帰る準備をしています...';
+      btnElement.disabled = true;
+
+      if (bgm && bgm.playing) {
+        const bgmBtn = document.getElementById('bgm-toggle');
+        bgmBtn.classList.add('muted');
+        bgmBtn.classList.remove('playing');
+        bgm.stop();
+        await sleep(1200);
+      } else {
+        await sleep(400);
+      }
+      location.reload();
+    }
+
+    (function makeStars() {
+      const stars = document.getElementById('stars');
+      for (let i = 0; i < 50; i++) {
+        const s = document.createElement('span');
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top  = Math.random() * 60  + '%';
+        s.style.animationDelay = (Math.random() * 3) + 's';
+        s.style.opacity = Math.random() * 0.6 + 0.2;
+        if (Math.random() < 0.2) { s.style.width = '3px'; s.style.height = '3px'; }
+        stars.appendChild(s);
+      }
+    })();
+
+    (function makePoles() {
+      const poles = document.getElementById('poles');
+      const total = 14;
+      for (let i = 0; i < total; i++) {
+        const p = document.createElement('div');
+        p.className = 'pole';
+        p.style.left = (i * (100 / (total / 2))) + '%';
+        poles.appendChild(p);
+      }
+    })();
+
+    (function makeAmbient() {
+      const wrap = document.getElementById('ambient');
+      for (let i = 0; i < 18; i++) {
+        const s = document.createElement('span');
+        s.style.left = Math.random() * 100 + 'vw';
+        const dur = 14 + Math.random() * 18;
+        s.style.animationDuration = dur + 's';
+        s.style.animationDelay = -Math.random() * dur + 's';
+        wrap.appendChild(s);
+      }
+    })();
+
+    // ============================================== //
+    // 🌅 時間帯判定 + 空テーマ切り替え
+    // ============================================== //
+    function getTimeOfDay() {
+      const h = new Date().getHours();
+      if (h >= 5 && h < 15) return 'day';
+      if (h >= 15 && h < 18) return 'evening';
+      return 'night';
+    }
+
+    const TRAIN_THEMES = {
+      night:   { body: '#c45a3e', stroke: '#7f3622', stripe: '#f5e6d3', top: '#8a3a25' },
+      day:     { body: '#d0d8e4', stroke: '#8a9aaa', stripe: '#f0f4f8', top: '#a0b0be' },
+      evening: { body: '#c4763e', stroke: '#8f4a22', stripe: '#f5dec8', top: '#8a5025' },
+    };
+
+    function applyTrainTheme(theme) {
+      const t = TRAIN_THEMES[theme];
+      const body   = document.getElementById('train-body');
+      const stripe = document.getElementById('train-stripe');
+      const top    = document.getElementById('train-top');
+      if (body)   { body.setAttribute('fill', t.body);   body.setAttribute('stroke', t.stroke); }
+      if (stripe) stripe.setAttribute('fill', t.stripe);
+      if (top)    top.setAttribute('fill', t.top);
+    }
+
+    function setSkyTheme(timeOfDay, weatherMood) {
+      const scene   = document.querySelector('.train-scene');
+      const moon    = document.querySelector('.moon');
+      const stars   = document.getElementById('stars');
+      const shoot   = document.querySelector('.shooting-star');
+      const sun     = document.getElementById('train-sun');
+      const clouds  = document.getElementById('train-clouds');
+      const sunset  = document.getElementById('train-sunset');
+      const rain    = document.getElementById('train-rain');
+      const snow    = document.getElementById('train-snow');
+
+      const isRainy  = ['rainy', 'foggy', 'stormy'].includes(weatherMood);
+      const isSnowy  = weatherMood === 'snowy';
+      const isStarry = weatherMood === 'starry';
+      const isCloudy = weatherMood === 'cloudy';
+
+      if (isRainy && rain.childElementCount === 0) {
+        for (let i = 0; i < 38; i++) {
+          const d = document.createElement('div');
+          d.className = 'raindrop';
+          d.style.left   = Math.random() * 100 + '%';
+          d.style.height = (10 + Math.random() * 14) + 'px';
+          d.style.animationDuration = (0.45 + Math.random() * 0.4) + 's';
+          d.style.animationDelay    = (-Math.random()) + 's';
+          rain.appendChild(d);
+        }
+      }
+
+      if (isSnowy && snow.childElementCount === 0) {
+        for (let i = 0; i < 28; i++) {
+          const d = document.createElement('div');
+          d.className = 'snowflake';
+          d.style.left   = Math.random() * 100 + '%';
+          const sz = 2 + Math.random() * 3;
+          d.style.width  = sz + 'px';
+          d.style.height = sz + 'px';
+          d.style.animationDuration = (2 + Math.random() * 2.5) + 's';
+          d.style.animationDelay    = (-Math.random() * 3) + 's';
+          snow.appendChild(d);
+        }
+      }
+
+      if (timeOfDay === 'day') {
+        scene.style.background = (isCloudy || isRainy)
+          ? 'linear-gradient(180deg, #4a5060 0%, #626e7a 40%, #7a8690 70%, #5a6670 100%)'
+          : 'linear-gradient(180deg, #3a8ad4 0%, #62a8e8 40%, #90c4f5 70%, #6aaa78 100%)';
+        moon.style.opacity  = '0';
+        stars.style.opacity = '0';
+        if (shoot) shoot.style.opacity = '0';
+        if (!isCloudy && !isRainy) {
+          sun.classList.add('visible');
+          clouds.classList.add('visible');
+        }
+        applyTrainTheme('day');
+
+      } else if (timeOfDay === 'evening') {
+        scene.style.background = isRainy
+          ? 'linear-gradient(180deg, #2a1e30 0%, #4a2e22 40%, #5a3e30 70%, #2e2020 100%)'
+          : 'linear-gradient(180deg, #160a28 0%, #6a2a18 35%, #c85e20 65%, #e89040 100%)';
+        moon.style.opacity  = '0';
+        stars.style.opacity = isRainy ? '0' : '0.35';
+        if (shoot) shoot.style.opacity = '0';
+        sunset.classList.add('visible');
+        applyTrainTheme('evening');
+
+      } else {
+        scene.style.background = isStarry
+          ? 'linear-gradient(180deg, #010208 0%, #04091a 40%, #080f2c 70%, #101a3a 100%)'
+          : 'linear-gradient(180deg, #0a0e1f 0%, #1a2240 40%, #2a3258 70%, #3d4670 100%)';
+        if (isStarry && !stars.querySelector('.extra-star')) {
+          for (let i = 0; i < 65; i++) {
+            const s = document.createElement('span');
+            s.className = 'extra-star';
+            s.style.cssText = `
+              position:absolute;
+              left:${Math.random() * 100}%;
+              top:${Math.random() * 85}%;
+              width:${Math.random() < 0.25 ? 3 : 2}px;
+              height:${Math.random() < 0.25 ? 3 : 2}px;
+              background:white; border-radius:50%;
+              animation: twinkle ${1.5 + Math.random() * 2}s infinite ease-in-out;
+              animation-delay:${Math.random() * 3}s;
+              opacity:${Math.random() * 0.7 + 0.3};
+            `;
+            stars.appendChild(s);
+          }
+        }
+        applyTrainTheme('night');
+      }
+
+      if (isRainy) rain.classList.add('visible');
+      if (isSnowy) snow.classList.add('visible');
+    }
+
+    function getWeatherInfo(code, isDay) {
+      const day = isDay !== 0; 
+      let text, mood;
+      if (code === 0) { text = day ? '澄んだ青空' : '満点の星空'; mood = day ? 'sunny' : 'starry'; }
+      else if (code <= 2) { text = day ? '穏やかな晴れ間' : '月明かりの夜'; mood = day ? 'sunny' : 'starry'; }
+      else if (code === 3) { text = day ? '優しい曇り空' : '雲に覆われた夜'; mood = 'cloudy'; }
+      else if (code <= 48) { text = day ? '霧で霞んだ空' : '霧の立ちこめる夜'; mood = 'foggy'; }
+      else if (code <= 57) { text = day ? '霧雨の降る空' : '霧雨の夜'; mood = 'rainy'; }
+      else if (code <= 67) { text = day ? '静かな雨' : '夜の雨'; mood = 'rainy'; }
+      else if (code <= 77) { text = day ? '舞い落ちる雪' : '夜の雪'; mood = 'snowy'; }
+      else if (code <= 82) { text = day ? 'にわか雨' : '夜のにわか雨'; mood = 'rainy'; }
+      else if (code <= 86) { text = day ? '雪のちらつく空' : '雪のちらつく夜'; mood = 'snowy'; }
+      else { text = day ? '少し荒れた天気' : '荒れた夜空'; mood = 'stormy'; }
+      return { text, mood, isDay: day };
+    }
+
+    function nowHHMM() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    async function startHomecoming() {
+      const selectedMoodArray = Array.from(document.querySelectorAll('.mood-tag.selected')).map(t => t.innerText);
+      const moodText = selectedMoodArray.join('、');
+      const passengerName = nicknameInput.value.trim();
+      const prefData = document.getElementById('pref-select').value.split(',');
+      const lat = prefData[0], lon = prefData[1], prefName = prefData[2];
+
+      navTo('screen-loading');
+      const loadingText = document.getElementById('loading-text');
+      const setLoading = async (html) => {
+        loadingText.style.opacity = 0;
+        await sleep(450);
+        loadingText.innerHTML = html;
+        loadingText.style.opacity = 1;
+      };
+
+      try {
+        await sleep(800);
+        await setLoading(`${prefName}行きの<br>列車に乗り込みました`);
+        await sleep(2000);
+
+        await setLoading(`${prefName}の現在の空模様を<br>調べています...`);
+        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
+        const weatherData = await weatherRes.json();
+        const weatherInfo = getWeatherInfo(weatherData.current_weather.weathercode, weatherData.current_weather.is_day);
+        const weatherString = weatherInfo.text;
+        
+        await sleep(1800);
+        // 🌅 天気メッセージと同時に空テーマを切り替える
+        setSkyTheme(getTimeOfDay(), weatherInfo.mood);
+        await setLoading(`どうやら今の${prefName}は<br>「${weatherString}」のようです`);
+        await sleep(2200);
+        await setLoading(`今のあなたの気分と、<br>${prefName}の空気を繋ぐ音楽を探しています...`);
+
+        const genreHints = ['90年代J-POP', '2000年代J-POP', '最近の邦楽インディーズ', 'シティポップ', '日本の女性シンガーソングライター', '日本の男性シンガーソングライター', 'アコースティックな邦楽の弾き語り', '日本のオルタナティヴ・ロック', 'J-Rock', '日本のフォーク', '昭和歌謡', 'チル系の邦楽', '邦楽のローファイ・ヒップホップ', '日本のネオソウル/R&B', 'ピアノが美しい邦楽', '日本のバンドサウンド', 'ボカロP出身アーティスト', 'アニメ・映画主題歌の名曲(邦楽)'];
+        const randomGenre = genreHints[Math.floor(Math.random() * genreHints.length)];
+        const randomSeed  = Math.floor(Math.random() * 100000);
+
+        const aiResponse = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+},
+          body: JSON.stringify({
+            model: 'gpt-5.4-mini',
+            messages: [
+              {
+                role: 'system',
+                content: `あなたはユーザーに「帰る場所」を提供する優秀なDJです。
+【絶対ルール】
+1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。毎回完全に異なるアーティスト・楽曲を選んでください。
+2. 「くるりのばらの花」や「島人ぬ宝」など、定番すぎる曲は避けてください。
+3. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
+4. 今回は【${randomGenre}】のジャンルや雰囲気を隠し味として意識し、隠れた名曲を選んでください。
+5. 楽曲は8〜9割の確率で日本語の歌詞の邦楽から選んでください。
+6. コメントは故郷の情景を交え、地元の旧友からの手紙のように温かく80文字程度で。
+【重要】手紙の中に、ユーザーが選んだ気分（嬉しい、疲れたなど）の言葉をそのまま使ったり、「〇〇な日は〜」と反復することは絶対に行わないでください。自然な話し言葉の励ましに変換してください。
+【超重要】アルバム名ではなく、必ず単一の「楽曲名（1曲）」を選曲してください。
+必ず以下のJSONフォーマットのみで返答してください。 {"artist": "アーティスト名", "title": "曲名", "comment": "手紙のような温かいコメント"}`
+              },
+              { role: 'user', content: `私の気分は「${moodText}」、故郷は「${prefName}」、故郷の今の天気は「${weatherString}」です。私にぴったりな1曲を選んでください。` }
+            ],
+            temperature: 0.9,
+            response_format: { type: "json_object" }
+          })
+        });
+
+        const aiData = await aiResponse.json();
+        if (aiData.error) throw new Error(aiData.error.message);
+
+        const resultJSON = JSON.parse(aiData.choices[0].message.content);
+        
+        const searchQuery = encodeURIComponent(`${resultJSON.artist} ${resultJSON.title}`);
+        const itunesResponse = await fetch(`https://itunes.apple.com/search?term=${searchQuery}&entity=song&country=jp&limit=1`);
+        const itunesData = await itunesResponse.json();
+
+        document.getElementById('ticket-name').innerText    = passengerName;
+        document.getElementById('ticket-dest').innerText    = prefName;
+        document.getElementById('ticket-weather').innerText = weatherString;
+        document.getElementById('ticket-time').innerText    = nowHHMM();
+        
+        if (itunesData.results && itunesData.results.length > 0) {
+          const track = itunesData.results[0];
+          document.getElementById('result-title').innerText   = track.trackName;
+          document.getElementById('result-artist').innerText  = track.artistName;
+          currentAppleMusicUrl = track.trackViewUrl;
+          document.getElementById('apple-music-btn').style.display = 'block';
+        } else {
+          document.getElementById('result-title').innerText   = resultJSON.title;
+          document.getElementById('result-artist').innerText  = resultJSON.artist;
+          document.getElementById('apple-music-btn').style.display = 'none';
+        }
+        
+        document.getElementById('result-comment').innerText = resultJSON.comment;
+
+        switch (weatherInfo.mood) {
+          case 'rainy': case 'snowy': case 'foggy': case 'stormy':
+            document.body.style.background = 'radial-gradient(ellipse at top, #1a2030 0%, #11141a 45%, #0a0c11 100%)'; break;
+          case 'cloudy':
+            document.body.style.background = 'radial-gradient(ellipse at top, #20232b 0%, #15171c 45%, #0e1015 100%)'; break;
+          case 'starry':
+            document.body.style.background = 'radial-gradient(ellipse at top, #1a2238 0%, #0e1325 45%, #060912 100%)'; break;
+          case 'sunny': default:
+            document.body.style.background = 'radial-gradient(ellipse at top, #2a2620 0%, #1c1a16 45%, #0e0d0a 100%)'; break;
+        }
+
+        await sleep(800);
+        navTo('screen-result');
+
+      } catch (error) {
+        console.error(error);
+        alert('エラーが発生しました\n' + error.message);
+        navTo('screen-top');
+      }
+    }
+
+    function openAppleMusic() {
+      if (currentAppleMusicUrl) window.open(currentAppleMusicUrl, '_blank');
+    }
+
+    function showToast(msg, duration = 2600) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    async function shareTicket() {
+      const btn = document.getElementById('share-btn');
+      const originalHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '画像を生成中...';
+
+      try {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+          try {
+            await document.fonts.load('500 58px "Zen Maru Gothic"', '今日の、わたしの帰省切符。');
+            await document.fonts.load('500 36px "Zen Maru Gothic"', 'ふるさとと、音楽で繋がる旅。');
+            await document.fonts.load('700 32px Nunito', 'CAELO #');
+            await document.fonts.load('700 30px "Zen Maru Gothic"', '帰る場所');
+          } catch(e) { console.warn('Font load warning', e); }
+        }
+
+        const ticketEl = document.querySelector('#screen-result .ticket');
+        
+        const ticketCanvas = await html2canvas(ticketEl, {
+          backgroundColor: null,
+          scale: 2,
+          useCORS: true,
+          logging: false
+        });
+
+        const W = 1080, H = 1920;
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = W;
+        finalCanvas.height = H;
+        const ctx = finalCanvas.getContext('2d');
+
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0,   '#1a2238');
+        grad.addColorStop(0.5, '#15171C');
+        grad.addColorStop(1,   '#0E1015');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        for (let i = 0; i < 110; i++) {
+          const sx = Math.random() * W, sy = Math.random() * (H * 0.55), sr = Math.random() * 1.8 + 0.4, so = Math.random() * 0.6 + 0.15;
+          ctx.fillStyle = `rgba(255, 255, 255, ${so})`;
+          ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill();
+        }
+        for (let i = 0; i < 5; i++) {
+          const sx = Math.random() * W, sy = Math.random() * (H * 0.4);
+          ctx.fillStyle = 'rgba(226, 207, 124, 0.9)';
+          ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, Math.PI * 2); ctx.fill();
+          const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 18);
+          glow.addColorStop(0, 'rgba(226, 207, 124, 0.4)'); glow.addColorStop(1, 'rgba(226, 207, 124, 0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath(); ctx.arc(sx, sy, 18, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // 🎨 SVGアセットを描画（logo + logotyp）
+        const loadSVG = (src) => new Promise((res) => {
+          const img = new Image();
+          img.onload = () => res(img);
+          img.onerror = () => res(null);
+          img.src = src;
+        });
+        
+        const logoImg = await loadSVG('img/logo.svg');
+        const logotypImg = await loadSVG('img/logotyp.svg');
+        
+        // logo.svg（アイコン）
+        if (logoImg) {
+          const logoSize = 110;
+          const logoX = (W - logoSize) / 2;
+          const logoY = 100;
+          
+          // ロゴのグロー効果
+          const logoGlow = ctx.createRadialGradient(logoX + logoSize/2, logoY + logoSize/2, 0, logoX + logoSize/2, logoY + logoSize/2, logoSize);
+          logoGlow.addColorStop(0, 'rgba(226, 207, 124, 0.4)');
+          logoGlow.addColorStop(0.5, 'rgba(226, 207, 124, 0.15)');
+          logoGlow.addColorStop(1, 'rgba(226, 207, 124, 0)');
+          ctx.fillStyle = logoGlow;
+          ctx.beginPath(); ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize, 0, Math.PI * 2); ctx.fill();
+          
+          // ロゴ本体
+          ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+        }
+        
+        // logotyp.svg（テキスト）— アスペクト比を保持
+        if (logotypImg) {
+          const logotypWidth = 240;
+          const logotypAspect = logotypImg.naturalHeight > 0 ? logotypImg.naturalWidth / logotypImg.naturalHeight : 1;
+          const logotypHeight = logotypWidth / logotypAspect;
+          const logotypX = (W - logotypWidth) / 2;
+          const logotypY = 230;
+          
+          // ロゴタイプのグロー効果
+          const typGlow = ctx.createRadialGradient(logotypX + logotypWidth/2, logotypY + logotypHeight/2, 0, logotypX + logotypWidth/2, logotypY + logotypHeight/2, Math.max(logotypWidth, logotypHeight));
+          typGlow.addColorStop(0, 'rgba(226, 207, 124, 0.35)');
+          typGlow.addColorStop(0.5, 'rgba(226, 207, 124, 0.1)');
+          typGlow.addColorStop(1, 'rgba(226, 207, 124, 0)');
+          ctx.fillStyle = typGlow;
+          ctx.beginPath(); ctx.arc(logotypX + logotypWidth/2, logotypY + logotypHeight/2, Math.max(logotypWidth, logotypHeight), 0, Math.PI * 2); ctx.fill();
+          
+          // ロゴタイプ本体
+          ctx.drawImage(logotypImg, logotypX, logotypY, logotypWidth, logotypHeight);
+        }
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#E8E6E1';
+        ctx.font = '500 58px "Zen Maru Gothic", sans-serif';
+        ctx.fillText('今日の、わたしの帰省切符。', W / 2, 350);
+
+        let targetW = 920;
+        let targetH = (targetW / ticketCanvas.width) * ticketCanvas.height;
+        
+        const maxH = 1150; 
+        if (targetH > maxH) {
+          const ratio = maxH / targetH;
+          targetH = maxH;
+          targetW = targetW * ratio;
+        }
+
+        const tx = (W - targetW) / 2;
+        const ty = 400 + (maxH - targetH) / 2;
+
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = targetW;
+        offCanvas.height = targetH;
+        const oCtx = offCanvas.getContext('2d');
+
+        oCtx.drawImage(ticketCanvas, 0, 0, targetW, targetH);
+
+        oCtx.globalCompositeOperation = 'destination-out';
+        oCtx.beginPath();
+        const holeRadius = 26 * (targetW / 920);
+        oCtx.arc(0, targetH * 0.6, holeRadius, 0, Math.PI * 2);
+        oCtx.arc(targetW, targetH * 0.6, holeRadius, 0, Math.PI * 2);
+        oCtx.fill();
+        oCtx.globalCompositeOperation = 'source-over'; 
+
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+        ctx.shadowBlur = 50;
+        ctx.shadowOffsetY = 28;
+        ctx.drawImage(offCanvas, tx, ty);
+        
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+
+        ctx.fillStyle = 'rgba(232, 230, 225, 0.72)';
+        ctx.font = '500 36px "Zen Maru Gothic", sans-serif';
+        ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, H - 200);
+
+        ctx.fillStyle = 'rgba(226, 207, 124, 0.92)';
+        ctx.font = '700 30px "Zen Maru Gothic", sans-serif';
+        ctx.fillText('#帰る場所', W / 2, H - 145);
+
+        finalCanvas.toBlob(async (blob) => {
+          if (!blob) {
+            showToast('画像の生成に失敗しました');
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+            return;
+          }
+
+          const fileName = 'caelo-music-ticket.png';
+          const file = new File([blob], fileName, { type: 'image/png' });
+
+          let shared = false;
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                files: [file],
+                title: 'CAELO',
+                text: '今日、音楽で帰省しました🎵\n#帰る場所'
+              });
+              shared = true;
+            } catch (e) {
+              if (e.name === 'AbortError') shared = true; 
+            }
+          }
+
+          if (!shared) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('画像を保存しました ✓ Instagram や LINE にシェアできます');
+          }
+
+          btn.disabled = false;
+          btn.innerHTML = originalHTML;
+        }, 'image/png');
+
+      } catch (e) {
+        console.error(e);
+        showToast('画像の生成に失敗しました: ' + e.message);
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -361,33 +361,6 @@
       50% { box-shadow: 0 0 0 2px #E2CF7C, 0 0 50px rgba(226, 207, 124, 1), 0 0 90px rgba(226, 207, 124, 0.7), inset 0 0 30px rgba(226, 207, 124, 0.5); }
     }
 
-    /* 📸 フォールバックモーダル (シェア・保存用) */
-    .modal {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-      z-index: 9999; display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    }
-    .modal.show {
-      opacity: 1; pointer-events: auto;
-    }
-    .modal-content {
-      background: var(--bg-color); padding: 2.4rem 1.2rem 1.2rem; border-radius: 16px;
-      text-align: center; position: relative; max-width: 90%; max-height: 90vh;
-      display: flex; flex-direction: column; align-items: center;
-      border: 1px solid rgba(226, 207, 124, 0.3);
-    }
-    .modal-content p {
-      color: var(--accent-color); font-weight: 700; margin: 0 0 1rem 0; font-size: 0.95rem; font-family: 'Zen Maru Gothic', sans-serif;
-    }
-    .modal-content img {
-      max-width: 100%; max-height: 65vh; object-fit: contain; border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    }
-    .modal-close {
-      position: absolute; top: 8px; right: 12px; background: none; border: none;
-      color: rgba(255,255,255,0.6); font-size: 1.8rem; cursor: pointer; padding: 0;
-    }
-
     /* 🚂 LOADING */
     .train-scene {
       position: relative; width: 100%; max-width: 460px; height: 240px;
@@ -544,14 +517,17 @@
     .ticket-title { font-family: 'Nunito', 'Zen Maru Gothic', sans-serif; font-size: 1.55rem; font-weight: 700; margin: 0.3rem 0 0.4rem; line-height: 1.35; letter-spacing: 0.01em; }
     .ticket-artist { font-family: 'Nunito', 'Zen Maru Gothic', sans-serif; color: #6a6a6a; font-size: 1rem; font-weight: 600; }
     
-    /* 🌟 禁則処理（文字の折り返し）を強制的に正すCSS */
+    /* 🌟 文字の折り返しと配置を強力に修正したCSS */
     .ai-comment { 
-      font-size: 0.95rem; line-height: 1.85; padding-top: 1.2rem; color: #444; 
+      font-size: 0.95rem; 
+      line-height: 1.85; 
+      padding-top: 1.2rem; 
+      color: #444; 
       font-family: 'Zen Maru Gothic', sans-serif; 
       text-align: left; 
-      word-break: break-word; 
-      overflow-wrap: break-word; 
+      word-break: normal; 
       line-break: strict; 
+      overflow-wrap: break-word; 
     }
 
     .barcode { height: 28px; margin-top: 1.3rem; background: repeating-linear-gradient(90deg, var(--ticket-text) 0 2px, transparent 2px 4px, var(--ticket-text) 4px 5px, transparent 5px 9px, var(--ticket-text) 9px 12px, transparent 12px 14px); opacity: 0.75; }
@@ -634,7 +610,6 @@
     <span class="bgm-hint" aria-hidden="true"></span>
   </button>
 
-  <!-- 🔊 効果音トグル -->
   <button id="sfx-toggle" class="sfx-toggle enabled" onclick="toggleSFX()" aria-label="効果音の切り替え" title="SFX">
     <svg class="sfx-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
@@ -643,27 +618,16 @@
     </svg>
   </button>
 
-  <!-- 🎵 BGM チュートリアル -->
   <div id="bgm-tutorial" class="bgm-tutorial">
     <div class="bgm-tutorial-overlay"></div>
     <div class="bgm-tutorial-message">右上のボタンをタップして<br>BGMを再生できます</div>
     <div class="bgm-tutorial-highlight"></div>
   </div>
 
-  <!-- 🔊 効果音チュートリアル -->
   <div id="sfx-tutorial" class="bgm-tutorial">
     <div class="bgm-tutorial-overlay"></div>
     <div class="bgm-tutorial-message">その下のボタンで<br>効果音をオフにできます</div>
     <div class="sfx-tutorial-highlight"></div>
-  </div>
-
-  <!-- 📸 モーダル (シェア・保存用フォールバック) -->
-  <div id="fallback-share-modal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()">×</button>
-      <p>画像を長押しして保存・シェアしてね📸</p>
-      <img id="fallback-image" src="" alt="帰省切符">
-    </div>
   </div>
 
   <div class="ambient-particles" id="ambient"></div>
@@ -922,8 +886,10 @@
 
   <script>
     // APIキーはVercel環境変数で管理（/api/chat経由）
-
     let currentAppleMusicUrl = '';
+    
+    // 🌟 iOSのセキュリティ回避用！画面が出た瞬間に裏で作っておくファイル
+    let preGeneratedShareFile = null;
 
     const moods = [
       '嬉しい', '楽しい！', '泣きたい', '懐かしい', '限界…',
@@ -977,7 +943,6 @@
       return _sharedAudioCtx;
     }
 
-    // 🎵 BGM チュートリアル表示
     function positionHighlight(highlightEl, buttonEl, overlayEl) {
       const rect = buttonEl.getBoundingClientRect();
       highlightEl.style.top    = rect.top + 'px';
@@ -1014,7 +979,6 @@
       }, 4000);
     }
 
-    // 🔊 効果音チュートリアル表示
     function showSFXTutorial() {
       if (localStorage.getItem('sfxTutorialShown')) return;
       const tutorial = document.getElementById('sfx-tutorial');
@@ -1097,7 +1061,8 @@
         this.playing = false;
       }
       async toggle() {
-        if (this.playing) this.stop(); else await this.play();
+        if (this.playing) this.stop();
+        else await this.play();
         return this.playing;
       }
     }
@@ -1172,10 +1137,6 @@
       const sfxBtn = document.getElementById('sfx-toggle');
       if (sfx.enabled) { sfxBtn.classList.add('enabled'); sfx.playButton(); } 
       else { sfxBtn.classList.remove('enabled'); }
-    }
-
-    function closeModal() {
-      document.getElementById('fallback-share-modal').classList.remove('show');
     }
 
     document.addEventListener('visibilitychange', () => {
@@ -1427,9 +1388,11 @@
           document.getElementById('apple-music-btn').style.display = 'none';
         }
         
-        // 🌟 修正：AIのテキスト内の不要な改行やスペースを削除し、禁則処理用のマーク(<wbr>)を追加
-        const cleanComment = resultJSON.comment.replace(/[\s\n\r　]+/g, ' ').trim();
-        document.getElementById('result-comment').innerHTML = cleanComment.replace(/。/g, '。<wbr>').replace(/、/g, '、<wbr>');
+        // 🌟 修正：文字のガタツキ（スペースや改行）をJavaScriptで完全に掃除する
+        let cleanText = resultJSON.comment;
+        cleanText = cleanText.replace(/[\r\n]+/g, ''); // 謎の改行を削除
+        cleanText = cleanText.replace(/([。、！？])\s+/g, '$1'); // 句読点の後のスペースを削除
+        document.getElementById('result-comment').innerText = cleanText.trim();
 
         switch (weatherInfo.mood) {
           case 'rainy': case 'snowy': case 'foggy': case 'stormy':
@@ -1444,6 +1407,9 @@
 
         await sleep(800);
         navTo('screen-result');
+        
+        // 🌟 修正：画面が切り替わった直後に「裏でコッソリ」シェア画像を生成しておく！
+        prepareShareImage();
 
       } catch (error) {
         console.error(error);
@@ -1464,12 +1430,8 @@
       toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
     }
 
-    async function shareTicket() {
-      const btn = document.getElementById('share-btn');
-      const originalHTML = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '画像を生成中...';
-
+    // 🌟 iOSのセキュリティ回避の要！ 画面が出た瞬間に画像を生成して変数に持たせておく関数
+    async function prepareShareImage() {
       try {
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
@@ -1482,18 +1444,13 @@
         }
 
         const ticketEl = document.querySelector('#screen-result .ticket');
-        
         const ticketCanvas = await html2canvas(ticketEl, {
-          backgroundColor: null,
-          scale: 2,
-          useCORS: true,
-          logging: false
+          backgroundColor: null, scale: 2, useCORS: true, logging: false
         });
 
         const W = 1080, H = 1920;
         const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = W;
-        finalCanvas.height = H;
+        finalCanvas.width = W; finalCanvas.height = H;
         const ctx = finalCanvas.getContext('2d');
 
         const grad = ctx.createLinearGradient(0, 0, 0, H);
@@ -1519,44 +1476,26 @@
         }
 
         const loadSVG = (src) => new Promise((res) => {
-          const img = new Image();
-          img.onload = () => res(img);
-          img.onerror = () => res(null);
-          img.src = src;
+          const img = new Image(); img.onload = () => res(img); img.onerror = () => res(null); img.src = src;
         });
         
         const logoImg = await loadSVG('img/logo.svg');
         const logotypImg = await loadSVG('img/logotyp.svg');
         
         if (logoImg) {
-          const logoSize = 110;
-          const logoX = (W - logoSize) / 2;
-          const logoY = 100;
-          
+          const logoSize = 110; const logoX = (W - logoSize) / 2; const logoY = 100;
           const logoGlow = ctx.createRadialGradient(logoX + logoSize/2, logoY + logoSize/2, 0, logoX + logoSize/2, logoY + logoSize/2, logoSize);
-          logoGlow.addColorStop(0, 'rgba(226, 207, 124, 0.4)');
-          logoGlow.addColorStop(0.5, 'rgba(226, 207, 124, 0.15)');
-          logoGlow.addColorStop(1, 'rgba(226, 207, 124, 0)');
-          ctx.fillStyle = logoGlow;
-          ctx.beginPath(); ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize, 0, Math.PI * 2); ctx.fill();
-          
+          logoGlow.addColorStop(0, 'rgba(226, 207, 124, 0.4)'); logoGlow.addColorStop(0.5, 'rgba(226, 207, 124, 0.15)'); logoGlow.addColorStop(1, 'rgba(226, 207, 124, 0)');
+          ctx.fillStyle = logoGlow; ctx.beginPath(); ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize, 0, Math.PI * 2); ctx.fill();
           ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
         }
         
         if (logotypImg) {
-          const logotypWidth = 240;
-          const logotypAspect = logotypImg.naturalHeight > 0 ? logotypImg.naturalWidth / logotypImg.naturalHeight : 1;
-          const logotypHeight = logotypWidth / logotypAspect;
-          const logotypX = (W - logotypWidth) / 2;
-          const logotypY = 230;
-          
+          const logotypWidth = 240; const logotypAspect = logotypImg.naturalHeight > 0 ? logotypImg.naturalWidth / logotypImg.naturalHeight : 1;
+          const logotypHeight = logotypWidth / logotypAspect; const logotypX = (W - logotypWidth) / 2; const logotypY = 230;
           const typGlow = ctx.createRadialGradient(logotypX + logotypWidth/2, logotypY + logotypHeight/2, 0, logotypX + logotypWidth/2, logotypY + logotypHeight/2, Math.max(logotypWidth, logotypHeight));
-          typGlow.addColorStop(0, 'rgba(226, 207, 124, 0.35)');
-          typGlow.addColorStop(0.5, 'rgba(226, 207, 124, 0.1)');
-          typGlow.addColorStop(1, 'rgba(226, 207, 124, 0)');
-          ctx.fillStyle = typGlow;
-          ctx.beginPath(); ctx.arc(logotypX + logotypWidth/2, logotypY + logotypHeight/2, Math.max(logotypWidth, logotypHeight), 0, Math.PI * 2); ctx.fill();
-          
+          typGlow.addColorStop(0, 'rgba(226, 207, 124, 0.35)'); typGlow.addColorStop(0.5, 'rgba(226, 207, 124, 0.1)'); typGlow.addColorStop(1, 'rgba(226, 207, 124, 0)');
+          ctx.fillStyle = typGlow; ctx.beginPath(); ctx.arc(logotypX + logotypWidth/2, logotypY + logotypHeight/2, Math.max(logotypWidth, logotypHeight), 0, Math.PI * 2); ctx.fill();
           ctx.drawImage(logotypImg, logotypX, logotypY, logotypWidth, logotypHeight);
         }
 
@@ -1567,99 +1506,79 @@
 
         let targetW = 860;
         let targetH = (targetW / ticketCanvas.width) * ticketCanvas.height;
-        
         const maxH = 1050; 
-        if (targetH > maxH) {
-          const ratio = maxH / targetH;
-          targetH = maxH;
-          targetW = targetW * ratio;
-        }
+        if (targetH > maxH) { const ratio = maxH / targetH; targetH = maxH; targetW = targetW * ratio; }
 
-        const tx = (W - targetW) / 2;
-        const ty = 470; 
+        const tx = (W - targetW) / 2; const ty = 470; 
 
         const offCanvas = document.createElement('canvas');
-        offCanvas.width = targetW;
-        offCanvas.height = targetH;
+        offCanvas.width = targetW; offCanvas.height = targetH;
         const oCtx = offCanvas.getContext('2d');
-
         oCtx.drawImage(ticketCanvas, 0, 0, targetW, targetH);
-
         oCtx.globalCompositeOperation = 'destination-out';
         oCtx.beginPath();
         const holeRadius = 26 * (targetW / 920);
-        oCtx.arc(0, targetH * 0.6, holeRadius, 0, Math.PI * 2);
-        oCtx.arc(targetW, targetH * 0.6, holeRadius, 0, Math.PI * 2);
-        oCtx.fill();
-        oCtx.globalCompositeOperation = 'source-over'; 
+        oCtx.arc(0, targetH * 0.6, holeRadius, 0, Math.PI * 2); oCtx.arc(targetW, targetH * 0.6, holeRadius, 0, Math.PI * 2);
+        oCtx.fill(); oCtx.globalCompositeOperation = 'source-over'; 
 
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
-        ctx.shadowBlur = 50;
-        ctx.shadowOffsetY = 28;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.55)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 28;
         ctx.drawImage(offCanvas, tx, ty);
-        
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetY = 0;
+        ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
 
         ctx.fillStyle = 'rgba(232, 230, 225, 0.8)';
         ctx.font = '500 40px "Zen Maru Gothic", sans-serif';
         ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, 1680);
-
         ctx.fillStyle = '#E2CF7C';
         ctx.font = '700 34px "Zen Maru Gothic", sans-serif';
         ctx.fillText('#帰る場所', W / 2, 1750);
 
-        // 🌟 ここで変数をちゃんと宣言！
-        let shared = false;
+        // Blobを生成してグローバル変数に格納
+        const blob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
+        preGeneratedShareFile = new File([blob], 'caelo-music-ticket.png', { type: 'image/png' });
         
-        const dataUrl = finalCanvas.toDataURL('image/png');
-        const blob = await (await fetch(dataUrl)).blob();
+      } catch (e) {
+        console.error('バックグラウンド画像生成エラー:', e);
+      }
+    }
 
-        if (!blob) {
-          showToast('画像の生成に失敗しました');
-          btn.disabled = false;
-          btn.innerHTML = originalHTML;
-          return;
-        }
+    // 🌟 シェアボタンが押された時の処理（画像はすでに出来ているので0秒で開く！）
+    async function shareTicket() {
+      // もし画像の事前生成がまだ終わっていなかった場合
+      if (!preGeneratedShareFile) {
+        showToast('シェア用の切符を準備中です。少し待ってからもう一度押してね！');
+        return;
+      }
 
-        const fileName = 'caelo-music-ticket.png';
-        const file = new File([blob], fileName, { type: 'image/png' });
-        
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file]
-            });
-            shared = true;
-          } catch (e) {
-            if (e.name === 'AbortError') {
-              shared = true; // ユーザーが自分で「×」を押しただけなのでOK
-            } else {
-              console.warn('Share failed:', e);
-            }
+      let shared = false;
+      
+      // 事前生成された画像を使って、0秒でシェアシートを呼び出す
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [preGeneratedShareFile] })) {
+        try {
+          await navigator.share({
+            files: [preGeneratedShareFile]
+          });
+          shared = true;
+        } catch (e) {
+          if (e.name === 'AbortError') {
+            shared = true; // ユーザーが自分で「×」を押して閉じただけなので正常
+          } else {
+            console.warn('Share failed:', e);
           }
         }
+      }
 
-        if (!shared) { 
-          const modal = document.getElementById('fallback-share-modal');
-          const fallbackImg = document.getElementById('fallback-image');
-          
-          // モーダルの中に生成した画像をセットして画面に出す
-          fallbackImg.src = dataUrl;
-          modal.classList.add('show');
-          
-          showToast('画像を長押しして保存・シェアしてね📸');
-        }
-
-        btn.disabled = false;
-        btn.innerHTML = originalHTML;
-
-      } catch (e) {
-        console.error(e);
-        showToast('画像の生成に失敗しました: ' + e.message);
-        btn.disabled = false;
-        btn.innerHTML = originalHTML;
+      // 何らかの理由でシェアシートが開かなかった場合の最終手段（ダウンロードさせる）
+      if (!shared) { 
+        const url = URL.createObjectURL(preGeneratedShareFile);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'caelo-music-ticket.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('画像を保存しました ✓ 手動でシェアしてください');
       }
     }
   </script>

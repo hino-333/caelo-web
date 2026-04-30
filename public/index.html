@@ -1062,6 +1062,7 @@
     function navTo(targetId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(targetId).classList.add('active');
+      window.scrollTo(0, 0);
     }
 
     let _sharedAudioCtx = null;

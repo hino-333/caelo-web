@@ -307,33 +307,22 @@
       border-color: rgba(226, 207, 124, 0.6);
       box-shadow: 0 4px 14px rgba(0,0,0,0.3), 0 0 14px rgba(226, 207, 124, 0.18);
     }
-    
-    /* 🔊 スピーカーアイコン (SVG) */
     .sfx-icon {
       display: block;
       transition: opacity 0.3s ease;
     }
-    
-    /* OFF時：音波を非表示 + ミュート線を表示 */
     .sfx-toggle:not(.enabled) .sfx-wave-1,
-    .sfx-toggle:not(.enabled) .sfx-wave-2 {
-      opacity: 0;
-    }
-    .sfx-toggle:not(.enabled) .sfx-icon {
-      opacity: 0.6;
-    }
+    .sfx-toggle:not(.enabled) .sfx-wave-2 { opacity: 0; }
+    .sfx-toggle:not(.enabled) .sfx-icon { opacity: 0.6; }
     .sfx-toggle:not(.enabled)::after {
       content: ''; position: absolute; top: 50%; left: 50%;
       width: 28px; height: 1.5px; background: currentColor;
       border-radius: 1px; transform: translate(-50%, -50%) rotate(-45deg);
       opacity: 0.7; pointer-events: none;
     }
-    
-    /* ON時：音波を表示 */
     .sfx-toggle.enabled .sfx-wave-1,
-    .sfx-toggle.enabled .sfx-wave-2 {
-      opacity: 1;
-    }
+    .sfx-toggle.enabled .sfx-wave-2 { opacity: 1; }
+    
     .bgm-hint {
       position: absolute; inset: -4px; border-radius: 50%;
       border: 1.5px solid rgba(226, 207, 124, 0.6);
@@ -349,84 +338,54 @@
 
     /* 🎵 BGM チュートリアル */
     .bgm-tutorial {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      opacity: 0;
-      pointer-events: none;
+      position: fixed; inset: 0; z-index: 200; opacity: 0; pointer-events: none;
       transition: opacity 0.4s ease;
     }
-    
-    .bgm-tutorial.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    
-    .bgm-tutorial-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-    }
-    
+    .bgm-tutorial.show { opacity: 1; pointer-events: auto; }
+    .bgm-tutorial-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); }
     .bgm-tutorial-message {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 520px;
-      background: rgba(20, 22, 28, 0.96);
-      color: #E2CF7C;
-      padding: 2rem 2.5rem;
-      border-radius: 16px;
-      text-align: center !important;
-      font-size: 1.15rem;
-      font-family: 'Zen Maru Gothic', sans-serif;
-      border: 1px solid rgba(226, 207, 124, 0.4);
-      z-index: 201;
-      line-height: 1.8;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 90%; max-width: 520px; background: rgba(20, 22, 28, 0.96); color: #E2CF7C;
+      padding: 2rem 2.5rem; border-radius: 16px; text-align: center !important;
+      font-size: 1.15rem; font-family: 'Zen Maru Gothic', sans-serif;
+      border: 1px solid rgba(226, 207, 124, 0.4); z-index: 201; line-height: 1.8; font-weight: 500;
+      letter-spacing: 0.05em; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
     }
-    
-    .bgm-tutorial-highlight {
-      position: fixed;
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px #E2CF7C,
-                  0 0 30px rgba(226, 207, 124, 0.8),
-                  0 0 60px rgba(226, 207, 124, 0.5),
-                  inset 0 0 20px rgba(226, 207, 124, 0.3);
-      z-index: 202;
-      pointer-events: none;
+    .bgm-tutorial-highlight, .sfx-tutorial-highlight {
+      position: fixed; border-radius: 50%; z-index: 202; pointer-events: none;
+      box-shadow: 0 0 0 2px #E2CF7C, 0 0 30px rgba(226, 207, 124, 0.8), 0 0 60px rgba(226, 207, 124, 0.5), inset 0 0 20px rgba(226, 207, 124, 0.3);
       animation: bgm-highlight-pulse 1.2s ease-in-out infinite;
     }
-    
-    .sfx-tutorial-highlight {
-      position: fixed;
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px #E2CF7C,
-                  0 0 30px rgba(226, 207, 124, 0.8),
-                  0 0 60px rgba(226, 207, 124, 0.5),
-                  inset 0 0 20px rgba(226, 207, 124, 0.3);
-      z-index: 202;
-      pointer-events: none;
-      animation: bgm-highlight-pulse 1.2s ease-in-out infinite;
-    }
-    
     @keyframes bgm-highlight-pulse {
-      0%, 100% { 
-        box-shadow: 0 0 0 2px #E2CF7C,
-                    0 0 30px rgba(226, 207, 124, 0.8), 
-                    0 0 60px rgba(226, 207, 124, 0.5), 
-                    inset 0 0 20px rgba(226, 207, 124, 0.3); 
-      }
-      50% { 
-        box-shadow: 0 0 0 2px #E2CF7C,
-                    0 0 50px rgba(226, 207, 124, 1), 
-                    0 0 90px rgba(226, 207, 124, 0.7), 
-                    inset 0 0 30px rgba(226, 207, 124, 0.5); 
-      }
+      0%, 100% { box-shadow: 0 0 0 2px #E2CF7C, 0 0 30px rgba(226, 207, 124, 0.8), 0 0 60px rgba(226, 207, 124, 0.5), inset 0 0 20px rgba(226, 207, 124, 0.3); }
+      50% { box-shadow: 0 0 0 2px #E2CF7C, 0 0 50px rgba(226, 207, 124, 1), 0 0 90px rgba(226, 207, 124, 0.7), inset 0 0 30px rgba(226, 207, 124, 0.5); }
+    }
+
+    /* 📸 フォールバックモーダル (シェア・保存用) */
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      z-index: 9999; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .modal.show {
+      opacity: 1; pointer-events: auto;
+    }
+    .modal-content {
+      background: var(--bg-color); padding: 2.4rem 1.2rem 1.2rem; border-radius: 16px;
+      text-align: center; position: relative; max-width: 90%; max-height: 90vh;
+      display: flex; flex-direction: column; align-items: center;
+      border: 1px solid rgba(226, 207, 124, 0.3);
+    }
+    .modal-content p {
+      color: var(--accent-color); font-weight: 700; margin: 0 0 1rem 0; font-size: 0.95rem; font-family: 'Zen Maru Gothic', sans-serif;
+    }
+    .modal-content img {
+      max-width: 100%; max-height: 65vh; object-fit: contain; border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .modal-close {
+      position: absolute; top: 8px; right: 12px; background: none; border: none;
+      color: rgba(255,255,255,0.6); font-size: 1.8rem; cursor: pointer; padding: 0;
     }
 
     /* 🚂 LOADING */
@@ -450,66 +409,31 @@
       box-shadow: 14px 10px 0 -2px rgba(220, 200, 160, 0.3);
     }
     .sun {
-      position: absolute; top: 22px; right: 50px;
-      width: 42px; height: 42px;
+      position: absolute; top: 22px; right: 50px; width: 42px; height: 42px;
       background: radial-gradient(circle at 40% 38%, #fffde0, #ffe566 50%, #ffb800);
       border-radius: 50%;
-      box-shadow: 0 0 28px rgba(255,220,50,0.8), 
-                  0 0 55px rgba(255,200,0,0.45), 
-                  0 0 90px rgba(255,180,0,0.2);
-      opacity: 0;
-      transition: opacity 2s ease;
-      pointer-events: none;
+      box-shadow: 0 0 28px rgba(255,220,50,0.8), 0 0 55px rgba(255,200,0,0.45), 0 0 90px rgba(255,180,0,0.2);
+      opacity: 0; transition: opacity 2s ease; pointer-events: none;
     }
-    .sun.visible {
-      opacity: 1;
-    }
+    .sun.visible { opacity: 1; }
     .day-cloud {
-      position: absolute;
-      background: rgba(255,255,255,0.92);
-      border-radius: 999px;
-      opacity: 0;
-      transition: opacity 2s ease;
-      pointer-events: none;
+      position: absolute; background: rgba(255,255,255,0.92); border-radius: 999px;
+      opacity: 0; transition: opacity 2s ease; pointer-events: none;
     }
-    .day-clouds.visible .day-cloud {
-      opacity: 1;
-    }
+    .day-clouds.visible .day-cloud { opacity: 1; }
     .sunset-overlay {
-      position: absolute; 
-      inset: 0;
-      background: linear-gradient(180deg,
-        rgba(30,10,50,0) 0%,
-        rgba(200,80,20,0.22) 45%,
-        rgba(240,130,30,0.38) 75%,
-        rgba(255,180,60,0.25) 100%
-      );
-      opacity: 0;
-      transition: opacity 2s ease;
-      pointer-events: none;
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(30,10,50,0) 0%, rgba(200,80,20,0.22) 45%, rgba(240,130,30,0.38) 75%, rgba(255,180,60,0.25) 100%);
+      opacity: 0; transition: opacity 2s ease; pointer-events: none;
     }
-    .sunset-overlay.visible {
-      opacity: 1;
+    .sunset-overlay.visible { opacity: 1; }
+    .rain-wrap, .snow-wrap {
+      position: absolute; inset: 0; overflow: hidden; opacity: 0; transition: opacity 1.5s ease; pointer-events: none; z-index: 4;
     }
-    .rain-wrap {
-      position: absolute; 
-      inset: 0; 
-      overflow: hidden;
-      opacity: 0;
-      transition: opacity 1.5s ease;
-      pointer-events: none;
-      z-index: 4;
-    }
-    .rain-wrap.visible {
-      opacity: 1;
-    }
+    .rain-wrap.visible, .snow-wrap.visible { opacity: 1; }
     .raindrop {
-      position: absolute; 
-      top: -12px;
-      width: 1px;
-      background: rgba(180,210,255,0.6);
-      border-radius: 1px;
-      animation: rain-fall linear infinite;
+      position: absolute; top: -12px; width: 1px; background: rgba(180,210,255,0.6);
+      border-radius: 1px; animation: rain-fall linear infinite;
     }
     @keyframes rain-fall {
       0%   { transform: translateY(0) rotate(10deg); opacity: 0; }
@@ -517,24 +441,9 @@
       92%  { opacity: 0.65; }
       100% { transform: translateY(260px) rotate(10deg); opacity: 0; }
     }
-    .snow-wrap {
-      position: absolute; 
-      inset: 0; 
-      overflow: hidden;
-      opacity: 0;
-      transition: opacity 1.5s ease;
-      pointer-events: none;
-      z-index: 4;
-    }
-    .snow-wrap.visible {
-      opacity: 1;
-    }
     .snowflake {
-      position: absolute; 
-      top: -6px;
-      background: rgba(255,255,255,0.88);
-      border-radius: 50%;
-      animation: snow-fall linear infinite;
+      position: absolute; top: -6px; background: rgba(255,255,255,0.88);
+      border-radius: 50%; animation: snow-fall linear infinite;
     }
     @keyframes snow-fall {
       0%   { transform: translateY(0) translateX(0); opacity: 0; }
@@ -551,8 +460,7 @@
     .shooting-star {
       position: absolute; top: 40px; left: -50px; width: 60px; height: 1px;
       background: linear-gradient(90deg, transparent, #fff, transparent);
-      animation: shoot 6s linear infinite; animation-delay: 3s;
-      transition: opacity 2s ease;
+      animation: shoot 6s linear infinite; animation-delay: 3s; transition: opacity 2s ease;
     }
     @keyframes shoot {
       0% { transform: translate(0, 0) rotate(15deg); opacity: 0; }
@@ -578,27 +486,23 @@
     .pole::before { content: ''; position: absolute; top: 6px; left: -8px; width: 18px; height: 2px; background: #0a0a14; }
     .pole::after  { content: ''; position: absolute; top: 14px; left: -6px; width: 14px; height: 2px; background: #0a0a14; }
     .tracks {
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 50px;
-      background: linear-gradient(180deg, #1a1c24 0%, #0a0c12 100%);
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; background: linear-gradient(180deg, #1a1c24 0%, #0a0c12 100%);
     }
     .rail { position: absolute; left: 0; width: 100%; height: 2px; background: rgba(150, 150, 170, 0.5); }
     .rail.top { top: 14px; } .rail.bottom { top: 28px; background: rgba(180, 180, 200, 0.7); }
     .sleepers {
       position: absolute; bottom: 4px; left: 0; width: 200%; height: 12px;
-      background: repeating-linear-gradient(90deg, #2a2c38 0 14px, transparent 14px 32px);
-      animation: scroll-rail 0.8s linear infinite;
+      background: repeating-linear-gradient(90deg, #2a2c38 0 14px, transparent 14px 32px); animation: scroll-rail 0.8s linear infinite;
     }
     .train {
       position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-      animation: train-bob 0.45s ease-in-out infinite;
-      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.55)); z-index: 5;
+      animation: train-bob 0.45s ease-in-out infinite; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.55)); z-index: 5;
     }
     .train svg { display: block; }
     .headlight-beam {
       position: absolute; bottom: 38px; left: calc(50% + 88px); width: 100px; height: 30px;
       background: linear-gradient(90deg, rgba(255, 245, 200, 0.45), rgba(255, 245, 200, 0.15) 60%, transparent);
-      clip-path: polygon(0 40%, 100% 0%, 100% 100%, 0 60%);
-      animation: beam-flicker 2.5s ease-in-out infinite; pointer-events: none;
+      clip-path: polygon(0 40%, 100% 0%, 100% 100%, 0 60%); animation: beam-flicker 2.5s ease-in-out infinite; pointer-events: none;
     }
     @keyframes beam-flicker { 0%,100% { opacity: 0.85; } 50% { opacity: 1; } }
     @keyframes train-bob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-1.5px); } }
@@ -608,77 +512,59 @@
     @keyframes scroll-rail { 0%{transform:translateX(0)} 100%{transform:translateX(-32px)} }
 
     .loading-text {
-      font-size: 1.05rem; line-height: 1.9; min-height: 4em; color: var(--accent-soft);
-      letter-spacing: 0.04em; transition: opacity 0.5s ease; font-weight: 500;
+      font-size: 1.05rem; line-height: 1.9; min-height: 4em; color: var(--accent-soft); letter-spacing: 0.04em; transition: opacity 0.5s ease; font-weight: 500;
     }
     .loading-dot {
-      display: inline-block; width: 5px; height: 5px; background: var(--accent-color);
-      border-radius: 50%; margin: 0 3px; animation: dot-bounce 1.2s infinite ease-in-out;
+      display: inline-block; width: 5px; height: 5px; background: var(--accent-color); border-radius: 50%; margin: 0 3px; animation: dot-bounce 1.2s infinite ease-in-out;
     }
     .loading-dot:nth-child(2) { animation-delay: 0.15s; } .loading-dot:nth-child(3) { animation-delay: 0.3s; }
     @keyframes dot-bounce { 0%,80%,100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-5px); opacity: 1; } }
 
     /* 🎟️ チケット */
     .ticket-wrapper {
-      filter: drop-shadow(0 24px 40px rgba(0,0,0,0.55));
-      margin-bottom: 2rem;
-      animation: floatTicket 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-      opacity: 0; transform: translateY(40px) rotate(-1.5deg);
+      filter: drop-shadow(0 24px 40px rgba(0,0,0,0.55)); margin-bottom: 2rem;
+      animation: floatTicket 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards; opacity: 0; transform: translateY(40px) rotate(-1.5deg);
     }
     @keyframes floatTicket { to { opacity: 1; transform: translateY(0) rotate(0); } }
     .ticket {
-      background-color: var(--ticket-bg);
-      color: var(--ticket-text);
-      border-radius: 14px;
-      padding: 1.8rem 1.8rem 1.4rem;
-      position: relative;
-      text-align: left;
+      background-color: var(--ticket-bg); color: var(--ticket-text); border-radius: 14px; padding: 1.8rem 1.8rem 1.4rem; position: relative; text-align: left;
       background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.012) 0 2px, transparent 2px 4px);
-      -webkit-mask-image: 
-        radial-gradient(circle at 0 60%, transparent 13px, black 13.5px),
-        radial-gradient(circle at 100% 60%, transparent 13px, black 13.5px);
-      -webkit-mask-composite: source-in;
-      mask-image: 
-        radial-gradient(circle at 0 60%, transparent 13px, black 13.5px),
-        radial-gradient(circle at 100% 60%, transparent 13px, black 13.5px);
-      mask-composite: intersect;
+      -webkit-mask-image: radial-gradient(circle at 0 60%, transparent 13px, black 13.5px), radial-gradient(circle at 100% 60%, transparent 13px, black 13.5px);
+      -webkit-mask-composite: source-in; mask-image: radial-gradient(circle at 0 60%, transparent 13px, black 13.5px), radial-gradient(circle at 100% 60%, transparent 13px, black 13.5px); mask-composite: intersect;
     }
     .ticket::before {
-      content: ''; position: absolute;
-      top: 12px; left: 12px; right: 12px; bottom: 12px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 6px; pointer-events: none;
+      content: ''; position: absolute; top: 12px; left: 12px; right: 12px; bottom: 12px; border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 6px; pointer-events: none;
     }
     .ticket-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; }
     .ticket-row + .ticket-row { margin-top: 1rem; }
-    .ticket-label {
-      font-family: 'Nunito', sans-serif; font-size: 0.68rem; color: #999;
-      letter-spacing: 0.18em; margin-bottom: 0.25rem; font-weight: 700; text-transform: uppercase;
-    }
+    .ticket-label { font-family: 'Nunito', sans-serif; font-size: 0.68rem; color: #999; letter-spacing: 0.18em; margin-bottom: 0.25rem; font-weight: 700; text-transform: uppercase; }
     .ticket-value { font-family: 'Nunito', 'Zen Maru Gothic', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--ticket-text); }
     .zen-maru-text { font-family: 'Zen Maru Gothic', sans-serif; font-size: 1.3rem; color: var(--ticket-text); font-weight: 700; }
     .ticket-body { padding: 1.3rem 0; margin-top: 1.2rem; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1.5px dashed rgba(0,0,0,0.2); }
     .ticket-title { font-family: 'Nunito', 'Zen Maru Gothic', sans-serif; font-size: 1.55rem; font-weight: 700; margin: 0.3rem 0 0.4rem; line-height: 1.35; letter-spacing: 0.01em; }
     .ticket-artist { font-family: 'Nunito', 'Zen Maru Gothic', sans-serif; color: #6a6a6a; font-size: 1rem; font-weight: 600; }
-    .ai-comment { font-size: 0.95rem; line-height: 1.85; padding-top: 1.2rem; color: #444; font-family: 'Zen Maru Gothic', sans-serif; }
-    .barcode {
-      height: 28px; margin-top: 1.3rem;
-      background: repeating-linear-gradient(90deg, var(--ticket-text) 0 2px, transparent 2px 4px, var(--ticket-text) 4px 5px, transparent 5px 9px, var(--ticket-text) 9px 12px, transparent 12px 14px);
-      opacity: 0.75;
+    
+    /* 🌟 禁則処理（文字の折り返し）を強制的に正すCSS */
+    .ai-comment { 
+      font-size: 0.95rem; line-height: 1.85; padding-top: 1.2rem; color: #444; 
+      font-family: 'Zen Maru Gothic', sans-serif; 
+      text-align: left; 
+      word-break: break-word; 
+      overflow-wrap: break-word; 
+      line-break: strict; 
     }
+
+    .barcode { height: 28px; margin-top: 1.3rem; background: repeating-linear-gradient(90deg, var(--ticket-text) 0 2px, transparent 2px 4px, var(--ticket-text) 4px 5px, transparent 5px 9px, var(--ticket-text) 9px 12px, transparent 12px 14px); opacity: 0.75; }
     .ticket-stamp {
-      position: absolute; top: 14px; right: 14px; width: 56px; height: 56px;
-      border: 2px solid rgba(180, 60, 60, 0.5); border-radius: 50%; color: rgba(180, 60, 60, 0.65);
-      font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
-      transform: rotate(-12deg); letter-spacing: 0.05em; line-height: 1.2; text-align: center;
+      position: absolute; top: 14px; right: 14px; width: 56px; height: 56px; border: 2px solid rgba(180, 60, 60, 0.5); border-radius: 50%; color: rgba(180, 60, 60, 0.65);
+      font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; transform: rotate(-12deg); letter-spacing: 0.05em; line-height: 1.2; text-align: center;
     }
     .apple-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem; margin-top: -3px; }
 
     /* How it works */
     .how-it-works {
       margin: 0 auto 2.2rem; max-width: 380px; display: flex; flex-direction: column; gap: 0.85rem;
-      padding: 1.4rem 1.2rem; background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 16px; text-align: left; position: relative;
+      padding: 1.4rem 1.2rem; background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px; text-align: left; position: relative;
     }
     .how-title { font-family: 'Zen Maru Gothic', sans-serif; font-size: 0.92rem; letter-spacing: 0.3em; color: var(--accent-color); font-weight: 700; text-align: center; margin-bottom: 0.4rem; opacity: 0.85; }
     .step { display: flex; align-items: center; gap: 0.95rem; }
@@ -769,6 +655,15 @@
     <div class="bgm-tutorial-overlay"></div>
     <div class="bgm-tutorial-message">その下のボタンで<br>効果音をオフにできます</div>
     <div class="sfx-tutorial-highlight"></div>
+  </div>
+
+  <!-- 📸 モーダル (シェア・保存用フォールバック) -->
+  <div id="fallback-share-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <p>画像を長押しして保存・シェアしてね📸</p>
+      <img id="fallback-image" src="" alt="帰省切符">
+    </div>
   </div>
 
   <div class="ambient-particles" id="ambient"></div>
@@ -1091,23 +986,17 @@
       highlightEl.style.height = rect.height + 'px';
       highlightEl.style.right  = 'auto';
 
-      // ボタンの中心座標と半径
       const cx = rect.left + rect.width / 2;
       const cy = rect.top  + rect.height / 2;
       const r  = rect.width / 2;
-
-      // オーバーレイにボタン部分だけ穴を開ける
       overlayEl.style.background = `radial-gradient(circle ${r}px at ${cx}px ${cy}px, transparent ${r}px, rgba(0,0,0,0.78) ${r + 1}px)`;
     }
 
     function showBGMTutorial() {
-      // 1回目のみ表示
       if (localStorage.getItem('bgmTutorialShown')) {
-        // BGM チュートリアル既に見てたら、SFX も確認
         showSFXTutorial();
         return;
       }
-      
       const tutorial = document.getElementById('bgm-tutorial');
       if (!tutorial) return;
       
@@ -1118,21 +1007,16 @@
         tutorial.querySelector('.bgm-tutorial-overlay')
       );
       
-      // 3秒後に自動消去
       setTimeout(() => {
         tutorial.classList.remove('show');
         localStorage.setItem('bgmTutorialShown', 'true');
-        
-        // BGM チュートリアル消去後、効果音チュートリアルを表示
         setTimeout(showSFXTutorial, 500);
       }, 4000);
     }
 
     // 🔊 効果音チュートリアル表示
     function showSFXTutorial() {
-      // 1回目のみ表示
       if (localStorage.getItem('sfxTutorialShown')) return;
-      
       const tutorial = document.getElementById('sfx-tutorial');
       if (!tutorial) return;
       
@@ -1143,14 +1027,12 @@
         tutorial.querySelector('.bgm-tutorial-overlay')
       );
       
-      // 3秒後に自動消去
       setTimeout(() => {
         tutorial.classList.remove('show');
         localStorage.setItem('sfxTutorialShown', 'true');
       }, 3000);
     }
 
-    // ページロード時に実行
     window.addEventListener('load', () => {
       setTimeout(showBGMTutorial, 600);
     });
@@ -1174,30 +1056,20 @@
         lp.connect(this.ctx.destination);
 
         const notes = [
-          { freq: 130.81, gain: 0.18 },
-          { freq: 196.00, gain: 0.13 },
-          { freq: 246.94, gain: 0.10 },
-          { freq: 329.63, gain: 0.08 },
+          { freq: 130.81, gain: 0.18 }, { freq: 196.00, gain: 0.13 },
+          { freq: 246.94, gain: 0.10 }, { freq: 329.63, gain: 0.08 },
           { freq: 392.00, gain: 0.06 },
         ];
         notes.forEach((note, i) => {
           [0, 6].forEach((cents, j) => {
             const osc = this.ctx.createOscillator();
-            osc.type = 'sine';
-            osc.frequency.value = note.freq * Math.pow(2, cents / 1200);
-            const gain = this.ctx.createGain();
-            gain.gain.value = note.gain * (j === 0 ? 1 : 0.6);
-            const vibLfo = this.ctx.createOscillator();
-            vibLfo.type = 'sine';
-            vibLfo.frequency.value = 0.08 + i * 0.025;
-            const vibGain = this.ctx.createGain();
-            vibGain.gain.value = note.freq * 0.0015;
+            osc.type = 'sine'; osc.frequency.value = note.freq * Math.pow(2, cents / 1200);
+            const gain = this.ctx.createGain(); gain.gain.value = note.gain * (j === 0 ? 1 : 0.6);
+            const vibLfo = this.ctx.createOscillator(); vibLfo.type = 'sine'; vibLfo.frequency.value = 0.08 + i * 0.025;
+            const vibGain = this.ctx.createGain(); vibGain.gain.value = note.freq * 0.0015;
             vibLfo.connect(vibGain); vibGain.connect(osc.frequency);
-            const tremLfo = this.ctx.createOscillator();
-            tremLfo.type = 'sine';
-            tremLfo.frequency.value = 0.04 + i * 0.013 + j * 0.007;
-            const tremGain = this.ctx.createGain();
-            tremGain.gain.value = note.gain * 0.4;
+            const tremLfo = this.ctx.createOscillator(); tremLfo.type = 'sine'; tremLfo.frequency.value = 0.04 + i * 0.013 + j * 0.007;
+            const tremGain = this.ctx.createGain(); tremGain.gain.value = note.gain * 0.4;
             tremLfo.connect(tremGain); tremGain.connect(gain.gain);
             osc.connect(gain); gain.connect(this.master);
             osc.start(); vibLfo.start(); tremLfo.start();
@@ -1225,8 +1097,7 @@
         this.playing = false;
       }
       async toggle() {
-        if (this.playing) this.stop();
-        else await this.play();
+        if (this.playing) this.stop(); else await this.play();
         return this.playing;
       }
     }
@@ -1234,109 +1105,42 @@
     class SoundFx {
       constructor() {
         this.tagOnFreqs = [523.25, 659.25, 783.99, 987.77, 1174.66];
-        this.tagOffFreq = 392.00;
-        this.mainFreq   = 523.25;
-        this.specialFreq = 1174.66;
-        this._lastTagOnFreq = null;
-        this.enabled = true;  // 効果音の有効/無効
+        this.tagOffFreq = 392.00; this.mainFreq = 523.25; this.specialFreq = 1174.66;
+        this._lastTagOnFreq = null; this.enabled = true;
       }
-
       _ctx() { return getOrCreateAudioCtx(); }
-
       _playBell(freq, opts = {}) {
-        if (!this.enabled) return;  // 効果音がOFFなら何もしない
-        
+        if (!this.enabled) return;
         const ctx = this._ctx();
         if (!ctx) return;
         if (ctx.state === 'suspended') ctx.resume();
-
         const now = ctx.currentTime;
-        const dur         = opts.duration ?? 1.5;
-        const peak        = opts.gain     ?? 0.16;
-        const detune      = opts.detune   ?? 7;
-        const subOctave   = opts.subOctave ?? false;
-        const fifthGain   = opts.fifth    ?? 0.14;
-        const attack      = opts.attack   ?? 0.025;
-
+        const dur = opts.duration ?? 1.5, peak = opts.gain ?? 0.16, detune = opts.detune ?? 7;
+        const subOctave = opts.subOctave ?? false, fifthGain = opts.fifth ?? 0.14, attack = opts.attack ?? 0.025;
         const env = ctx.createGain();
-        env.gain.setValueAtTime(0.0001, now);
-        env.gain.exponentialRampToValueAtTime(peak, now + attack);
-        env.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-
+        env.gain.setValueAtTime(0.0001, now); env.gain.exponentialRampToValueAtTime(peak, now + attack); env.gain.exponentialRampToValueAtTime(0.0001, now + dur);
         const lp = ctx.createBiquadFilter();
-        lp.type = 'lowpass';
-        lp.frequency.value = Math.min(freq * 6, 3200);
-        lp.Q.value = 0.6;
-
-        env.connect(lp);
-        lp.connect(ctx.destination);
-
+        lp.type = 'lowpass'; lp.frequency.value = Math.min(freq * 6, 3200); lp.Q.value = 0.6;
+        env.connect(lp); lp.connect(ctx.destination);
         const startOsc = (frequency, amp) => {
-          const osc = ctx.createOscillator();
-          osc.type = 'sine';
-          osc.frequency.value = frequency;
-          const g = ctx.createGain();
-          g.gain.value = amp;
-          osc.connect(g); g.connect(env);
-          osc.start(now);
-          osc.stop(now + dur + 0.15);
+          const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.value = frequency;
+          const g = ctx.createGain(); g.gain.value = amp;
+          osc.connect(g); g.connect(env); osc.start(now); osc.stop(now + dur + 0.15);
         };
-
-        startOsc(freq, 1.0);
-        startOsc(freq * Math.pow(2, detune / 1200), 0.55);
-
+        startOsc(freq, 1.0); startOsc(freq * Math.pow(2, detune / 1200), 0.55);
         if (fifthGain > 0) startOsc(freq * 1.5, fifthGain);
-
         if (subOctave) startOsc(freq / 2, 0.55);
       }
-
       playTagOn() {
         let freq;
-        do {
-          freq = this.tagOnFreqs[Math.floor(Math.random() * this.tagOnFreqs.length)];
-        } while (freq === this._lastTagOnFreq && this.tagOnFreqs.length > 1);
+        do { freq = this.tagOnFreqs[Math.floor(Math.random() * this.tagOnFreqs.length)]; } 
+        while (freq === this._lastTagOnFreq && this.tagOnFreqs.length > 1);
         this._lastTagOnFreq = freq;
-
-        this._playBell(freq, {
-          duration: 1.4,
-          gain: 0.14,
-          detune: 8,
-          fifth: 0.10,
-          attack: 0.018
-        });
+        this._playBell(freq, { duration: 1.4, gain: 0.14, detune: 8, fifth: 0.10, attack: 0.018 });
       }
-
-      playTagOff() {
-        this._playBell(this.tagOffFreq, {
-          duration: 1.6,
-          gain: 0.12,
-          detune: 6,
-          fifth: 0.08,
-          attack: 0.025
-        });
-      }
-
-      playButton() {
-        this._playBell(this.mainFreq, {
-          duration: 2.0,
-          gain: 0.16,
-          detune: 9,
-          fifth: 0.13,
-          subOctave: false,
-          attack: 0.03
-        });
-      }
-
-      playButtonSpecial() {
-        this._playBell(this.specialFreq, {
-          duration: 1.8,
-          gain: 0.17,
-          detune: 10,
-          fifth: 0.15,
-          subOctave: false,
-          attack: 0.02
-        });
-      }
+      playTagOff() { this._playBell(this.tagOffFreq, { duration: 1.6, gain: 0.12, detune: 6, fifth: 0.08, attack: 0.025 }); }
+      playButton() { this._playBell(this.mainFreq, { duration: 2.0, gain: 0.16, detune: 9, fifth: 0.13, subOctave: false, attack: 0.03 }); }
+      playButtonSpecial() { this._playBell(this.specialFreq, { duration: 1.8, gain: 0.17, detune: 10, fifth: 0.15, subOctave: false, attack: 0.02 }); }
     }
 
     const bgm = new AmbientPad();
@@ -1344,15 +1148,9 @@
 
     document.addEventListener('click', (e) => {
       const target = e.target.closest('.btn, .back-btn');
-      if (!target) return;
-      if (target.id === 'bgm-toggle') return;
-      if (target.disabled) return;
-      
-      if (target.id === 'btn-next-pref') {
-        sfx.playButtonSpecial();
-      } else {
-        sfx.playButton();
-      }
+      if (!target || target.id === 'bgm-toggle' || target.disabled) return;
+      if (target.id === 'btn-next-pref') sfx.playButtonSpecial();
+      else sfx.playButton();
     }, true);
 
     async function toggleBGM() {
@@ -1360,54 +1158,44 @@
       try {
         await bgm.toggle();
         if (bgm.playing) {
-          bgmBtn.classList.remove('muted');
-          bgmBtn.classList.add('playing');
+          bgmBtn.classList.remove('muted'); bgmBtn.classList.add('playing');
           const hint = bgmBtn.querySelector('.bgm-hint');
           if (hint) hint.remove();
         } else {
-          bgmBtn.classList.add('muted');
-          bgmBtn.classList.remove('playing');
+          bgmBtn.classList.add('muted'); bgmBtn.classList.remove('playing');
         }
-      } catch (e) {
-        console.warn('BGMの自動再生がブラウザにブロックされました', e);
-      }
+      } catch (e) { console.warn('BGMの自動再生がブラウザにブロックされました', e); }
     }
 
     function toggleSFX() {
       sfx.enabled = !sfx.enabled;
       const sfxBtn = document.getElementById('sfx-toggle');
-      if (sfx.enabled) {
-        sfxBtn.classList.add('enabled');
-        sfx.playButton();  // 有効化時に音を鳴らす
-      } else {
-        sfxBtn.classList.remove('enabled');
-      }
+      if (sfx.enabled) { sfxBtn.classList.add('enabled'); sfx.playButton(); } 
+      else { sfxBtn.classList.remove('enabled'); }
+    }
+
+    function closeModal() {
+      document.getElementById('fallback-share-modal').classList.remove('show');
     }
 
     document.addEventListener('visibilitychange', () => {
       if (!bgm.ctx || !bgm.playing) return;
       const now = bgm.ctx.currentTime;
       if (document.hidden) {
-        bgm.master.gain.cancelScheduledValues(now);
-        bgm.master.gain.linearRampToValueAtTime(0, now + 0.3);
+        bgm.master.gain.cancelScheduledValues(now); bgm.master.gain.linearRampToValueAtTime(0, now + 0.3);
       } else {
-        bgm.master.gain.cancelScheduledValues(now);
-        bgm.master.gain.linearRampToValueAtTime(bgm.targetGain, now + 0.6);
+        bgm.master.gain.cancelScheduledValues(now); bgm.master.gain.linearRampToValueAtTime(bgm.targetGain, now + 0.6);
       }
     });
 
     const sleep = ms => new Promise(res => setTimeout(res, ms));
 
     async function restartJourney(btnElement) {
-      btnElement.innerText = '帰る準備をしています...';
-      btnElement.disabled = true;
-
+      btnElement.innerText = '帰る準備をしています...'; btnElement.disabled = true;
       if (bgm && bgm.playing) {
-        const bgmBtn = document.getElementById('bgm-toggle');
-        bgmBtn.classList.add('muted');
-        bgmBtn.classList.remove('playing');
-        bgm.stop();
-        await sleep(1200);
+        document.getElementById('bgm-toggle').classList.add('muted');
+        document.getElementById('bgm-toggle').classList.remove('playing');
+        bgm.stop(); await sleep(1200);
       } else {
         await sleep(400);
       }
@@ -1418,10 +1206,8 @@
       const stars = document.getElementById('stars');
       for (let i = 0; i < 50; i++) {
         const s = document.createElement('span');
-        s.style.left = Math.random() * 100 + '%';
-        s.style.top  = Math.random() * 60  + '%';
-        s.style.animationDelay = (Math.random() * 3) + 's';
-        s.style.opacity = Math.random() * 0.6 + 0.2;
+        s.style.left = Math.random() * 100 + '%'; s.style.top  = Math.random() * 60  + '%';
+        s.style.animationDelay = (Math.random() * 3) + 's'; s.style.opacity = Math.random() * 0.6 + 0.2;
         if (Math.random() < 0.2) { s.style.width = '3px'; s.style.height = '3px'; }
         stars.appendChild(s);
       }
@@ -1429,30 +1215,21 @@
 
     (function makePoles() {
       const poles = document.getElementById('poles');
-      const total = 14;
-      for (let i = 0; i < total; i++) {
-        const p = document.createElement('div');
-        p.className = 'pole';
-        p.style.left = (i * (100 / (total / 2))) + '%';
-        poles.appendChild(p);
+      for (let i = 0; i < 14; i++) {
+        const p = document.createElement('div'); p.className = 'pole';
+        p.style.left = (i * (100 / 7)) + '%'; poles.appendChild(p);
       }
     })();
 
     (function makeAmbient() {
       const wrap = document.getElementById('ambient');
       for (let i = 0; i < 18; i++) {
-        const s = document.createElement('span');
-        s.style.left = Math.random() * 100 + 'vw';
-        const dur = 14 + Math.random() * 18;
-        s.style.animationDuration = dur + 's';
-        s.style.animationDelay = -Math.random() * dur + 's';
-        wrap.appendChild(s);
+        const s = document.createElement('span'); s.style.left = Math.random() * 100 + 'vw';
+        const dur = 14 + Math.random() * 18; s.style.animationDuration = dur + 's';
+        s.style.animationDelay = -Math.random() * dur + 's'; wrap.appendChild(s);
       }
     })();
 
-    // ============================================== //
-    // 🌅 時間帯判定 + 空テーマ切り替え
-    // ============================================== //
     function getTimeOfDay() {
       const h = new Date().getHours();
       if (h >= 5 && h < 15) return 'day';
@@ -1468,52 +1245,39 @@
 
     function applyTrainTheme(theme) {
       const t = TRAIN_THEMES[theme];
-      const body   = document.getElementById('train-body');
-      const stripe = document.getElementById('train-stripe');
-      const top    = document.getElementById('train-top');
-      if (body)   { body.setAttribute('fill', t.body);   body.setAttribute('stroke', t.stroke); }
+      const body = document.getElementById('train-body'); const stripe = document.getElementById('train-stripe'); const top = document.getElementById('train-top');
+      if (body) { body.setAttribute('fill', t.body); body.setAttribute('stroke', t.stroke); }
       if (stripe) stripe.setAttribute('fill', t.stripe);
-      if (top)    top.setAttribute('fill', t.top);
+      if (top) top.setAttribute('fill', t.top);
     }
 
     function setSkyTheme(timeOfDay, weatherMood) {
-      const scene   = document.querySelector('.train-scene');
-      const moon    = document.querySelector('.moon');
-      const stars   = document.getElementById('stars');
-      const shoot   = document.querySelector('.shooting-star');
-      const sun     = document.getElementById('train-sun');
-      const clouds  = document.getElementById('train-clouds');
-      const sunset  = document.getElementById('train-sunset');
-      const rain    = document.getElementById('train-rain');
-      const snow    = document.getElementById('train-snow');
+      const scene = document.querySelector('.train-scene'); const moon = document.querySelector('.moon');
+      const stars = document.getElementById('stars'); const shoot = document.querySelector('.shooting-star');
+      const sun = document.getElementById('train-sun'); const clouds = document.getElementById('train-clouds');
+      const sunset = document.getElementById('train-sunset'); const rain = document.getElementById('train-rain');
+      const snow = document.getElementById('train-snow');
 
-      const isRainy  = ['rainy', 'foggy', 'stormy'].includes(weatherMood);
-      const isSnowy  = weatherMood === 'snowy';
+      const isRainy = ['rainy', 'foggy', 'stormy'].includes(weatherMood);
+      const isSnowy = weatherMood === 'snowy';
       const isStarry = weatherMood === 'starry';
       const isCloudy = weatherMood === 'cloudy';
 
       if (isRainy && rain.childElementCount === 0) {
         for (let i = 0; i < 38; i++) {
-          const d = document.createElement('div');
-          d.className = 'raindrop';
-          d.style.left   = Math.random() * 100 + '%';
-          d.style.height = (10 + Math.random() * 14) + 'px';
-          d.style.animationDuration = (0.45 + Math.random() * 0.4) + 's';
-          d.style.animationDelay    = (-Math.random()) + 's';
+          const d = document.createElement('div'); d.className = 'raindrop';
+          d.style.left = Math.random() * 100 + '%'; d.style.height = (10 + Math.random() * 14) + 'px';
+          d.style.animationDuration = (0.45 + Math.random() * 0.4) + 's'; d.style.animationDelay = (-Math.random()) + 's';
           rain.appendChild(d);
         }
       }
 
       if (isSnowy && snow.childElementCount === 0) {
         for (let i = 0; i < 28; i++) {
-          const d = document.createElement('div');
-          d.className = 'snowflake';
-          d.style.left   = Math.random() * 100 + '%';
-          const sz = 2 + Math.random() * 3;
-          d.style.width  = sz + 'px';
-          d.style.height = sz + 'px';
-          d.style.animationDuration = (2 + Math.random() * 2.5) + 's';
-          d.style.animationDelay    = (-Math.random() * 3) + 's';
+          const d = document.createElement('div'); d.className = 'snowflake';
+          d.style.left = Math.random() * 100 + '%'; const sz = 2 + Math.random() * 3;
+          d.style.width = sz + 'px'; d.style.height = sz + 'px';
+          d.style.animationDuration = (2 + Math.random() * 2.5) + 's'; d.style.animationDelay = (-Math.random() * 3) + 's';
           snow.appendChild(d);
         }
       }
@@ -1522,44 +1286,25 @@
         scene.style.background = (isCloudy || isRainy)
           ? 'linear-gradient(180deg, #4a5060 0%, #626e7a 40%, #7a8690 70%, #5a6670 100%)'
           : 'linear-gradient(180deg, #3a8ad4 0%, #62a8e8 40%, #90c4f5 70%, #6aaa78 100%)';
-        moon.style.opacity  = '0';
-        stars.style.opacity = '0';
+        moon.style.opacity = '0'; stars.style.opacity = '0';
         if (shoot) shoot.style.opacity = '0';
-        if (!isCloudy && !isRainy) {
-          sun.classList.add('visible');
-          clouds.classList.add('visible');
-        }
+        if (!isCloudy && !isRainy) { sun.classList.add('visible'); clouds.classList.add('visible'); }
         applyTrainTheme('day');
-
       } else if (timeOfDay === 'evening') {
         scene.style.background = isRainy
           ? 'linear-gradient(180deg, #2a1e30 0%, #4a2e22 40%, #5a3e30 70%, #2e2020 100%)'
           : 'linear-gradient(180deg, #160a28 0%, #6a2a18 35%, #c85e20 65%, #e89040 100%)';
-        moon.style.opacity  = '0';
-        stars.style.opacity = isRainy ? '0' : '0.35';
+        moon.style.opacity = '0'; stars.style.opacity = isRainy ? '0' : '0.35';
         if (shoot) shoot.style.opacity = '0';
-        sunset.classList.add('visible');
-        applyTrainTheme('evening');
-
+        sunset.classList.add('visible'); applyTrainTheme('evening');
       } else {
         scene.style.background = isStarry
           ? 'linear-gradient(180deg, #010208 0%, #04091a 40%, #080f2c 70%, #101a3a 100%)'
           : 'linear-gradient(180deg, #0a0e1f 0%, #1a2240 40%, #2a3258 70%, #3d4670 100%)';
         if (isStarry && !stars.querySelector('.extra-star')) {
           for (let i = 0; i < 65; i++) {
-            const s = document.createElement('span');
-            s.className = 'extra-star';
-            s.style.cssText = `
-              position:absolute;
-              left:${Math.random() * 100}%;
-              top:${Math.random() * 85}%;
-              width:${Math.random() < 0.25 ? 3 : 2}px;
-              height:${Math.random() < 0.25 ? 3 : 2}px;
-              background:white; border-radius:50%;
-              animation: twinkle ${1.5 + Math.random() * 2}s infinite ease-in-out;
-              animation-delay:${Math.random() * 3}s;
-              opacity:${Math.random() * 0.7 + 0.3};
-            `;
+            const s = document.createElement('span'); s.className = 'extra-star';
+            s.style.cssText = `position:absolute; left:${Math.random() * 100}%; top:${Math.random() * 85}%; width:${Math.random() < 0.25 ? 3 : 2}px; height:${Math.random() < 0.25 ? 3 : 2}px; background:white; border-radius:50%; animation: twinkle ${1.5 + Math.random() * 2}s infinite ease-in-out; animation-delay:${Math.random() * 3}s; opacity:${Math.random() * 0.7 + 0.3};`;
             stars.appendChild(s);
           }
         }
@@ -1571,8 +1316,7 @@
     }
 
     function getWeatherInfo(code, isDay) {
-      const day = isDay !== 0; 
-      let text, mood;
+      const day = isDay !== 0; let text, mood;
       if (code === 0) { text = day ? '澄んだ青空' : '満点の星空'; mood = day ? 'sunny' : 'starry'; }
       else if (code <= 2) { text = day ? '穏やかな晴れ間' : '月明かりの夜'; mood = day ? 'sunny' : 'starry'; }
       else if (code === 3) { text = day ? '優しい曇り空' : '雲に覆われた夜'; mood = 'cloudy'; }
@@ -1587,8 +1331,7 @@
     }
 
     function nowHHMM() {
-      const d = new Date();
-      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      const d = new Date(); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
 
     async function startHomecoming() {
@@ -1601,17 +1344,11 @@
       navTo('screen-loading');
       const loadingText = document.getElementById('loading-text');
       const setLoading = async (html) => {
-        loadingText.style.opacity = 0;
-        await sleep(450);
-        loadingText.innerHTML = html;
-        loadingText.style.opacity = 1;
+        loadingText.style.opacity = 0; await sleep(450); loadingText.innerHTML = html; loadingText.style.opacity = 1;
       };
 
       try {
-        await sleep(800);
-        await setLoading(`${prefName}行きの<br>列車に乗り込みました`);
-        await sleep(2000);
-
+        await sleep(800); await setLoading(`${prefName}行きの<br>列車に乗り込みました`); await sleep(2000);
         await setLoading(`${prefName}の現在の空模様を<br>調べています...`);
         const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
         const weatherData = await weatherRes.json();
@@ -1619,33 +1356,39 @@
         const weatherString = weatherInfo.text;
         
         await sleep(1800);
-        // 🌅 天気メッセージと同時に空テーマを切り替える
         setSkyTheme(getTimeOfDay(), weatherInfo.mood);
         await setLoading(`どうやら今の${prefName}は<br>「${weatherString}」のようです`);
         await sleep(2200);
         await setLoading(`今のあなたの気分と、<br>${prefName}の空気を繋ぐ音楽を探しています...`);
 
-        const genreHints = ['90年代J-POP', '2000年代J-POP', '最近の邦楽インディーズ', 'シティポップ', '日本の女性シンガーソングライター', '日本の男性シンガーソングライター', 'アコースティックな邦楽の弾き語り', '日本のオルタナティヴ・ロック', 'J-Rock', '日本のフォーク', '昭和歌謡', 'チル系の邦楽', '邦楽のローファイ・ヒップホップ', '日本のネオソウル/R&B', 'ピアノが美しい邦楽', '日本のバンドサウンド', 'ボカロP出身アーティスト', 'アニメ・映画主題歌の名曲(邦楽)'];
+        const genreHints = [
+          '90年代J-POPの心に染みる名曲', '2000年代の懐かしいヒット曲', '2010年代の隠れた名曲', '2020年代の隠れた名曲',
+          '有名アーティストのファンに愛される名曲', '夜に聴きたいシティポップ', 
+          '日本の女性シンガーソングライターの定番曲', '日本の男性シンガーソングライターのエモい曲', 
+          'アコースティックな邦楽', '日本のオルタナティヴ・ロック（邦ロック）の定番', 
+          'エモいJ-Rock', '昭和歌謡・平成レトロな名曲', 'チル系の邦楽（深夜に合う）', 
+          '最近の邦楽（少し落ち着いた曲）', '日本のネオソウル/R&B', 
+          'ピアノが美しい邦楽', 'ボカロP出身アーティストのエモーショナルな楽曲',
+          'アニメ・映画主題歌の心に残る名曲(邦楽)'
+        ];
         const randomGenre = genreHints[Math.floor(Math.random() * genreHints.length)];
-        const randomSeed  = Math.floor(Math.random() * 100000);
+        const randomSeed  = Math.floor(Math.random() * 1000000);
 
         const aiResponse = await fetch('/api/chat', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: 'gpt-4o-mini',
             messages: [
               {
                 role: 'system',
-                content: `あなたはユーザーに「帰る場所」を提供する優秀なDJです。
+                content: `あなたはユーザーに「帰る場所」を提供する、音楽への愛が深いDJです。
 【絶対ルール】
-1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。毎回完全に異なるアーティスト・楽曲を選んでください。
-2. 「くるりのばらの花」や「島人ぬ宝」など、定番すぎる曲は避けてください。
-3. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
-4. 今回は【${randomGenre}】のジャンルや雰囲気を隠し味として意識し、隠れた名曲を選んでください。
-5. 楽曲は8〜9割の確率で日本語の歌詞の邦楽から選んでください。
+1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。毎回異なるアーティスト・楽曲を選んでください。
+2. 知名度のバランスが命です。Mr.Childrenの「口笛」のような【ある程度知名度はあるが、ベタすぎない絶妙なライン】を狙って選曲してください。
+3. 今回は【${randomGenre}】のジャンルや雰囲気を隠し味として意識してください。
+4. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
+5. 楽曲は9割以上の確率で日本語の歌詞の邦楽から選んでください。
 6. コメントは故郷の情景を交え、地元の旧友からの手紙のように温かく80文字程度で。
 【重要】手紙の中に、ユーザーが選んだ気分（嬉しい、疲れたなど）の言葉をそのまま使ったり、「〇〇な日は〜」と反復することは絶対に行わないでください。自然な話し言葉の励ましに変換してください。
 【超重要】アルバム名ではなく、必ず単一の「楽曲名（1曲）」を選曲してください。
@@ -1684,7 +1427,9 @@
           document.getElementById('apple-music-btn').style.display = 'none';
         }
         
-        document.getElementById('result-comment').innerText = resultJSON.comment;
+        // 🌟 修正：AIのテキスト内の不要な改行やスペースを削除し、禁則処理用のマーク(<wbr>)を追加
+        const cleanComment = resultJSON.comment.replace(/[\s\n\r　]+/g, ' ').trim();
+        document.getElementById('result-comment').innerHTML = cleanComment.replace(/。/g, '。<wbr>').replace(/、/g, '、<wbr>');
 
         switch (weatherInfo.mood) {
           case 'rainy': case 'snowy': case 'foggy': case 'stormy':
@@ -1726,11 +1471,9 @@
       btn.innerHTML = '画像を生成中...';
 
       try {
-        // --- html2canvas 画像生成 (保存・手動シェア用) ---
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
           try {
-            // キャッチコピー（上）のフォントもロード
             await document.fonts.load('500 54px "Zen Maru Gothic"', '今日の、わたしの帰省切符。');
             await document.fonts.load('500 40px "Zen Maru Gothic"', 'ふるさとと、音楽で繋がる旅。');
             await document.fonts.load('700 32px Nunito', 'CAELO #');
@@ -1775,7 +1518,6 @@
           ctx.beginPath(); ctx.arc(sx, sy, 18, 0, Math.PI * 2); ctx.fill();
         }
 
-        // 🎨 SVGアセットを描画
         const loadSVG = (src) => new Promise((res) => {
           const img = new Image();
           img.onload = () => res(img);
@@ -1786,13 +1528,11 @@
         const logoImg = await loadSVG('img/logo.svg');
         const logotypImg = await loadSVG('img/logotyp.svg');
         
-        // logo.svg（アイコン）
         if (logoImg) {
           const logoSize = 110;
           const logoX = (W - logoSize) / 2;
           const logoY = 100;
           
-          // ロゴのグロー効果
           const logoGlow = ctx.createRadialGradient(logoX + logoSize/2, logoY + logoSize/2, 0, logoX + logoSize/2, logoY + logoSize/2, logoSize);
           logoGlow.addColorStop(0, 'rgba(226, 207, 124, 0.4)');
           logoGlow.addColorStop(0.5, 'rgba(226, 207, 124, 0.15)');
@@ -1800,11 +1540,9 @@
           ctx.fillStyle = logoGlow;
           ctx.beginPath(); ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize, 0, Math.PI * 2); ctx.fill();
           
-          // ロゴ本体
           ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
         }
         
-        // logotyp.svg（テキスト）
         if (logotypImg) {
           const logotypWidth = 240;
           const logotypAspect = logotypImg.naturalHeight > 0 ? logotypImg.naturalWidth / logotypImg.naturalHeight : 1;
@@ -1812,7 +1550,6 @@
           const logotypX = (W - logotypWidth) / 2;
           const logotypY = 230;
           
-          // ロゴタイプのグロー効果
           const typGlow = ctx.createRadialGradient(logotypX + logotypWidth/2, logotypY + logotypHeight/2, 0, logotypX + logotypWidth/2, logotypY + logotypHeight/2, Math.max(logotypWidth, logotypHeight));
           typGlow.addColorStop(0, 'rgba(226, 207, 124, 0.35)');
           typGlow.addColorStop(0.5, 'rgba(226, 207, 124, 0.1)');
@@ -1820,14 +1557,10 @@
           ctx.fillStyle = typGlow;
           ctx.beginPath(); ctx.arc(logotypX + logotypWidth/2, logotypY + logotypHeight/2, Math.max(logotypWidth, logotypHeight), 0, Math.PI * 2); ctx.fill();
           
-          // ロゴタイプ本体
           ctx.drawImage(logotypImg, logotypX, logotypY, logotypWidth, logotypHeight);
         }
 
-        // --- 文字色の修正 ---
         ctx.textAlign = 'center';
-        
-        // 🌟 ご要望：キャッチコピー（上）を黄色にする
         ctx.fillStyle = '#E2CF7C'; 
         ctx.font = '500 54px "Zen Maru Gothic", sans-serif';
         ctx.fillText('今日の、わたしの帰省切符。', W / 2, 400);
@@ -1843,7 +1576,7 @@
         }
 
         const tx = (W - targetW) / 2;
-        const ty = 470; // Set safely below the title
+        const ty = 470; 
 
         const offCanvas = document.createElement('canvas');
         offCanvas.width = targetW;
@@ -1869,19 +1602,20 @@
         ctx.shadowBlur = 0;
         ctx.shadowOffsetY = 0;
 
-        // 🌟 ご要望：「ふるさとと、音楽で繋がる旅。」（下）を白（グレー）に戻す
         ctx.fillStyle = 'rgba(232, 230, 225, 0.8)';
         ctx.font = '500 40px "Zen Maru Gothic", sans-serif';
         ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, 1680);
 
-        // ハッシュタグは黄色のまま
         ctx.fillStyle = '#E2CF7C';
         ctx.font = '700 34px "Zen Maru Gothic", sans-serif';
         ctx.fillText('#帰る場所', W / 2, 1750);
 
-        // --- 保存 & シェアの実行 ---
-        const blob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
+        // 🌟 ここで変数をちゃんと宣言！
+        let shared = false;
         
+        const dataUrl = finalCanvas.toDataURL('image/png');
+        const blob = await (await fetch(dataUrl)).blob();
+
         if (!blob) {
           showToast('画像の生成に失敗しました');
           btn.disabled = false;
@@ -1892,39 +1626,30 @@
         const fileName = 'caelo-music-ticket.png';
         const file = new File([blob], fileName, { type: 'image/png' });
         
-        // 🌟 ここです！ 前回消しちゃった変数宣言！
-        let shared = false;
-        
-        // シェア機能があれば呼び出す
-        if (navigator.share) {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-              await navigator.share({
-                files: [file]
-              });
-              shared = true;
-            }
+            await navigator.share({
+              files: [file]
+            });
+            shared = true;
           } catch (e) {
             if (e.name === 'AbortError') {
-              shared = true; // ユーザーがキャンセルしただけなのでエラーにしない
+              shared = true; // ユーザーが自分で「×」を押しただけなのでOK
             } else {
               console.warn('Share failed:', e);
             }
           }
         }
 
-        // 共有シートが開けなかった場合（またはiOSで弾かれた場合）はダウンロードさせる
         if (!shared) { 
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+          const modal = document.getElementById('fallback-share-modal');
+          const fallbackImg = document.getElementById('fallback-image');
           
-          showToast('画像を保存しました ✓ 手動でシェアしてください');
+          // モーダルの中に生成した画像をセットして画面に出す
+          fallbackImg.src = dataUrl;
+          modal.classList.add('show');
+          
+          showToast('画像を長押しして保存・シェアしてね📸');
         }
 
         btn.disabled = false;

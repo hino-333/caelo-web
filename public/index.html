@@ -839,7 +839,7 @@
       <option value="37.7500,140.4678,福島県">福島県</option>
       <option value="36.3418,140.4468,茨城県">茨城県</option>
       <option value="36.5658,139.8836,栃木県">栃木県</option>
-      <option value="36.3911,139.0608,群生県">群馬県</option>
+      <option value="36.3911,139.0608,群馬県">群馬県</option>
       <option value="35.8572,139.6490,埼玉県">埼玉県</option>
       <option value="35.6051,140.1233,千葉県">千葉県</option>
       <option value="35.6894,139.6917,東京都">東京都</option>
@@ -1864,66 +1864,62 @@
         ctx.shadowBlur = 0;
         ctx.shadowOffsetY = 0;
 
-        ctx.fillStyle = 'rgba(232, 230, 225, 0.8)';
+        // 🌟 修正：文字色をテーマカラーの黄色（#E2CF7C）に変更
+        ctx.fillStyle = '#E2CF7C';
         ctx.font = '500 40px "Zen Maru Gothic", sans-serif';
         ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, 1680);
 
-        ctx.fillStyle = 'rgba(226, 207, 124, 0.95)';
+        ctx.fillStyle = '#E2CF7C';
         ctx.font = '700 34px "Zen Maru Gothic", sans-serif';
         ctx.fillText('#帰る場所', W / 2, 1750);
 
-        finalCanvas.toBlob(async (blob) => {
-          if (!blob) {
-            showToast('画像の生成に失敗しました');
-            btn.disabled = false;
-            btn.innerHTML = originalHTML;
-            return;
-          }
-
-          const fileName = 'caelo-music-ticket.png';
-          const file = new File([blob], fileName, { type: 'image/png' });
-          let shared = false;
-
-          // スマホのネイティブ共有機能（シェアシート）を呼び出す
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-              await navigator.share({
-                files: [file],
-                title: 'CAELO',
-                text: '今日、音楽で帰省しました🎵\n#帰る場所'
-              });
-              shared = true;
-            } catch (e) {
-              if (e.name === 'AbortError') {
-                shared = true; // ユーザーがキャンセルしただけなのでエラーにしない
-              } else {
-                console.warn('Share failed:', e);
-              }
-            }
-          }
-
-          // シェアシートが開けなかった場合のみダウンロード＆トースト表示
-          if (!shared) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('画像を保存しました ✓ InstagramやLINEにシェアできます');
-          } else {
-             // シェア成功時はシンプルなメッセージにするか、何もしない
-             // 共有シートで完了しているのでトーストは不要かもですが、一応成功状態に戻す
-             btn.disabled = false;
-             btn.innerHTML = originalHTML;
-             return; // exit early
-          }
-
+        // 🌟 修正：iOS Safari対策として、Promiseを使って同期的にBlobを生成
+        const blob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
+        
+        if (!blob) {
+          showToast('画像の生成に失敗しました');
           btn.disabled = false;
           btn.innerHTML = originalHTML;
-        }, 'image/png');
+          return;
+        }
+
+        const fileName = 'caelo-music-ticket.png';
+        const file = new File([blob], fileName, { type: 'image/png' });
+        let shared = false;
+
+        // スマホのネイティブ共有機能（シェアシート）を呼び出す
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              // iOS対策：テキストと一緒に渡すとファイルが無視されることがあるため、一旦消すか画像優先にする
+              // 今回はInstagramを優先したいので、ファイルのみを渡す方が安定します
+            });
+            shared = true;
+          } catch (e) {
+            if (e.name === 'AbortError') {
+              shared = true; // ユーザーがキャンセルしただけなのでエラーにしない
+            } else {
+              console.warn('Share failed:', e);
+            }
+          }
+        }
+
+        // シェアシートが開けなかった場合のみダウンロード＆トースト表示
+        if (!shared) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast('画像を保存しました ✓ InstagramやLINEにシェアできます');
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
 
       } catch (e) {
         console.error(e);

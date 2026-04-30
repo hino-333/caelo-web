@@ -691,7 +691,7 @@
     .toast {
       position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(160%);
       background: rgba(20, 22, 26, 0.96); color: var(--accent-color); padding: 0.9rem 1.6rem;
-      border-radius: 999px; font-size: 0.95rem; border: 1px solid rgba(226, 207, 124, 0.3);
+      border-radius: 14px; font-size: 0.95rem; border: 1px solid rgba(226, 207, 124, 0.3);
       transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); z-index: 100; pointer-events: none;
       backdrop-filter: blur(10px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); max-width: 90vw; text-align: center;
     }
@@ -839,7 +839,7 @@
       <option value="37.7500,140.4678,福島県">福島県</option>
       <option value="36.3418,140.4468,茨城県">茨城県</option>
       <option value="36.5658,139.8836,栃木県">栃木県</option>
-      <option value="36.3911,139.0608,群馬県">群馬県</option>
+      <option value="36.3911,139.0608,群生県">群馬県</option>
       <option value="35.8572,139.6490,埼玉県">埼玉県</option>
       <option value="35.6051,140.1233,千葉県">千葉県</option>
       <option value="35.6894,139.6917,東京都">東京都</option>
@@ -1633,7 +1633,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-},
+          },
           body: JSON.stringify({
             model: 'gpt-5.4-mini',
             messages: [
@@ -1823,14 +1823,14 @@
         }
 
         ctx.textAlign = 'center';
-        ctx.fillStyle = '#E2CF7C';
-        ctx.font = '500 58px "Zen Maru Gothic", sans-serif';
-        ctx.fillText('今日の、わたしの帰省切符。', W / 2, 420);
+        ctx.fillStyle = '#E8E6E1';
+        ctx.font = '500 54px "Zen Maru Gothic", sans-serif';
+        ctx.fillText('今日の、わたしの帰省切符。', W / 2, 400);
 
-        let targetW = 920;
+        let targetW = 860;
         let targetH = (targetW / ticketCanvas.width) * ticketCanvas.height;
         
-        const maxH = 1150; 
+        const maxH = 1050; 
         if (targetH > maxH) {
           const ratio = maxH / targetH;
           targetH = maxH;
@@ -1838,7 +1838,7 @@
         }
 
         const tx = (W - targetW) / 2;
-        const ty = 400 + (maxH - targetH) / 2;
+        const ty = 470; // Set safely below the title
 
         const offCanvas = document.createElement('canvas');
         offCanvas.width = targetW;
@@ -1864,13 +1864,13 @@
         ctx.shadowBlur = 0;
         ctx.shadowOffsetY = 0;
 
-        ctx.fillStyle = 'rgba(232, 230, 225, 0.72)';
-        ctx.font = '500 36px "Zen Maru Gothic", sans-serif';
-        ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, H - 200);
+        ctx.fillStyle = 'rgba(232, 230, 225, 0.8)';
+        ctx.font = '500 40px "Zen Maru Gothic", sans-serif';
+        ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, 1680);
 
-        ctx.fillStyle = 'rgba(226, 207, 124, 0.92)';
-        ctx.font = '700 30px "Zen Maru Gothic", sans-serif';
-        ctx.fillText('#帰る場所', W / 2, H - 145);
+        ctx.fillStyle = 'rgba(226, 207, 124, 0.95)';
+        ctx.font = '700 34px "Zen Maru Gothic", sans-serif';
+        ctx.fillText('#帰る場所', W / 2, 1750);
 
         finalCanvas.toBlob(async (blob) => {
           if (!blob) {
@@ -1882,8 +1882,9 @@
 
           const fileName = 'caelo-music-ticket.png';
           const file = new File([blob], fileName, { type: 'image/png' });
-
           let shared = false;
+
+          // スマホのネイティブ共有機能（シェアシート）を呼び出す
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
               await navigator.share({
@@ -1893,10 +1894,15 @@
               });
               shared = true;
             } catch (e) {
-              if (e.name === 'AbortError') shared = true; 
+              if (e.name === 'AbortError') {
+                shared = true; // ユーザーがキャンセルしただけなのでエラーにしない
+              } else {
+                console.warn('Share failed:', e);
+              }
             }
           }
 
+          // シェアシートが開けなかった場合のみダウンロード＆トースト表示
           if (!shared) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1906,7 +1912,13 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showToast('画像を保存しました ✓ Instagram や LINE にシェアできます');
+            showToast('画像を保存しました ✓ InstagramやLINEにシェアできます');
+          } else {
+             // シェア成功時はシンプルなメッセージにするか、何もしない
+             // 共有シートで完了しているのでトーストは不要かもですが、一応成功状態に戻す
+             btn.disabled = false;
+             btn.innerHTML = originalHTML;
+             return; // exit early
           }
 
           btn.disabled = false;

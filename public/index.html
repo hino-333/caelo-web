@@ -1625,18 +1625,9 @@
         await sleep(2200);
         await setLoading(`今のあなたの気分と、<br>${prefName}の空気を繋ぐ音楽を探しています...`);
 
-        const genreHints = [
-          '90年代J-POPの心に染みる名曲', '2000年代の懐かしいヒット曲', '2010年代の隠れた名曲', '2020年代の隠れた名曲',
-          '有名アーティストのファンに愛される名曲', '夜に聴きたいシティポップ', 
-          '日本の女性シンガーソングライターの定番曲', '日本の男性シンガーソングライターのエモい曲', 
-          'アコースティックな邦楽', '日本のオルタナティヴ・ロック（邦ロック）の定番', 
-          'エモいJ-Rock', '昭和歌謡・平成レトロな名曲', 'チル系の邦楽（深夜に合う）', 
-          '最近の邦楽（少し落ち着いた曲）', '日本のネオソウル/R&B', 
-          'ピアノが美しい邦楽', 'ボカロP出身アーティストのエモーショナルな楽曲',
-          'アニメ・映画主題歌の心に残る名曲(邦楽)'
-        ];
+        const genreHints = ['90年代J-POP', '2000年代J-POP', '最近の邦楽インディーズ', 'シティポップ', '日本の女性シンガーソングライター', '日本の男性シンガーソングライター', 'アコースティックな邦楽の弾き語り', '日本のオルタナティヴ・ロック', 'J-Rock', '日本のフォーク', '昭和歌謡', 'チル系の邦楽', '邦楽のローファイ・ヒップホップ', '日本のネオソウル/R&B', 'ピアノが美しい邦楽', '日本のバンドサウンド', 'ボカロP出身アーティスト', 'アニメ・映画主題歌の名曲(邦楽)'];
         const randomGenre = genreHints[Math.floor(Math.random() * genreHints.length)];
-        const randomSeed  = Math.floor(Math.random() * 1000000);
+        const randomSeed  = Math.floor(Math.random() * 100000);
 
         const aiResponse = await fetch('/api/chat', {
           method: 'POST',
@@ -1648,13 +1639,13 @@
             messages: [
               {
                 role: 'system',
-                content: `あなたはユーザーに「帰る場所」を提供する、音楽への愛が深いDJです。
+                content: `あなたはユーザーに「帰る場所」を提供する優秀なDJです。
 【絶対ルール】
-1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。前回の選曲履歴は完全に忘れ、毎回異なるアーティスト・楽曲を選んでください。
-2. 知名度のバランスが命です。全く知らないマイナー曲ではなく、Mr.Childrenの「口笛」のような【ある程度知名度はあるが、ベタすぎない絶妙なライン（ファンに愛される名曲、少し懐かしいヒット曲、有名アーティストのエモい曲）】を狙って選曲してください。
-3. 今回は【${randomGenre}】のジャンルや雰囲気を隠し味として意識してください。
-4. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
-5. 楽曲は9割以上の確率で日本語の歌詞の邦楽から選んでください。
+1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。毎回完全に異なるアーティスト・楽曲を選んでください。
+2. 「くるりのばらの花」や「島人ぬ宝」など、定番すぎる曲は避けてください。
+3. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
+4. 今回は【${randomGenre}】のジャンルや雰囲気を隠し味として意識し、隠れた名曲を選んでください。
+5. 楽曲は8〜9割の確率で日本語の歌詞の邦楽から選んでください。
 6. コメントは故郷の情景を交え、地元の旧友からの手紙のように温かく80文字程度で。
 【重要】手紙の中に、ユーザーが選んだ気分（嬉しい、疲れたなど）の言葉をそのまま使ったり、「〇〇な日は〜」と反復することは絶対に行わないでください。自然な話し言葉の励ましに変換してください。
 【超重要】アルバム名ではなく、必ず単一の「楽曲名（1曲）」を選曲してください。
@@ -1662,7 +1653,7 @@
               },
               { role: 'user', content: `私の気分は「${moodText}」、故郷は「${prefName}」、故郷の今の天気は「${weatherString}」です。私にぴったりな1曲を選んでください。` }
             ],
-            temperature: 1.15, // 多様性を出しつつ、存在しない曲のハルシネーションを防ぐ絶妙なライン
+            temperature: 1.15,
             response_format: { type: "json_object" }
           })
         });
@@ -1734,24 +1725,16 @@
       btn.disabled = true;
       btn.innerHTML = '画像を生成中...';
 
-      // 🌟 根本的な iOS 対策: 画像生成前にURLシェアシートを出す試み
-      // ストーリーズに直接画像を渡すことはできないため、URL共有のみとする
-      const shareData = {
-        title: 'CAELO',
-        text: '今の気分にぴったりな帰省音楽を見つけました🎵 #CAELO',
-        url: window.location.href // サイトのURLを共有
-      };
-
       try {
         // --- html2canvas 画像生成 (保存・手動シェア用) ---
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
           try {
             // キャッチコピー（上）のフォントもロード
-            await document.fonts.load('500 58px "Zen Maru Gothic"', '今日の、わたしの帰省切符。');
-            await document.fonts.load('500 36px "Zen Maru Gothic"', 'ふるさとと、音楽で繋がる旅。');
+            await document.fonts.load('500 54px "Zen Maru Gothic"', '今日の、わたしの帰省切符。');
+            await document.fonts.load('500 40px "Zen Maru Gothic"', 'ふるさとと、音楽で繋がる旅。');
             await document.fonts.load('700 32px Nunito', 'CAELO #');
-            await document.fonts.load('700 30px "Zen Maru Gothic"', '帰る場所');
+            await document.fonts.load('700 34px "Zen Maru Gothic"', '帰る場所');
           } catch(e) { console.warn('Font load warning', e); }
         }
 
@@ -1792,7 +1775,7 @@
           ctx.beginPath(); ctx.arc(sx, sy, 18, 0, Math.PI * 2); ctx.fill();
         }
 
-        // 🎨 SVGアセットを描画（logo + logotyp）
+        // 🎨 SVGアセットを描画
         const loadSVG = (src) => new Promise((res) => {
           const img = new Image();
           img.onload = () => res(img);
@@ -1821,7 +1804,7 @@
           ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
         }
         
-        // logotyp.svg（テキスト）— アスペクト比を保持
+        // logotyp.svg（テキスト）
         if (logotypImg) {
           const logotypWidth = 240;
           const logotypAspect = logotypImg.naturalHeight > 0 ? logotypImg.naturalWidth / logotypImg.naturalHeight : 1;
@@ -1843,6 +1826,7 @@
 
         // --- 文字色の修正 ---
         ctx.textAlign = 'center';
+        
         // 🌟 ご要望：キャッチコピー（上）を黄色にする
         ctx.fillStyle = '#E2CF7C'; 
         ctx.font = '500 54px "Zen Maru Gothic", sans-serif';
@@ -1908,28 +1892,29 @@
         const fileName = 'caelo-music-ticket.png';
         const file = new File([blob], fileName, { type: 'image/png' });
         
-        // Android の場合はシェアシート（ファイル付き）を試みる
-        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        // 🌟 ここです！ 前回消しちゃった変数宣言！
+        let shared = false;
         
-        if (!isIOS && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        // シェア機能があれば呼び出す
+        if (navigator.share) {
           try {
-            await navigator.share({
-              files: [file],
-              // テキストも渡すとInstagramでファイルが無視されることがあるため、一旦消すか画像優先にする
-              // ストーリーズに画像とURLの両方は無理なので、画像（ファイル）のみを渡すのが安定。
-            });
-            shared = true;
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file]
+              });
+              shared = true;
+            }
           } catch (e) {
-            // ... same catch block ...
+            if (e.name === 'AbortError') {
+              shared = true; // ユーザーがキャンセルしただけなのでエラーにしない
+            } else {
+              console.warn('Share failed:', e);
+            }
           }
         }
 
-        // iOS の場合、またはAndroidで共有シートが失敗した場合は、画像をダウンロードさせる。
-        // トーストメッセージで手動シェアを促す。
-        if (!shared || (isIOS && navigator.share)) { 
-          // iOS Safari のnavigator.shareは画像生成後にブロックされるため、ここを通る。
-          // また、Androidなどでnavigator.shareが失敗した場合もここを通る。
-
+        // 共有シートが開けなかった場合（またはiOSで弾かれた場合）はダウンロードさせる
+        if (!shared) { 
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -1939,13 +1924,7 @@
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
           
-          if (isIOS) {
-            // iOS の場合
-            showToast('画像を保存しました ✓ カメラロールからシェアしてください');
-          } else {
-            // Androidなどで失敗した場合
-            showToast('画像を保存しました ✓ InstagramやLINEにシェアできます');
-          }
+          showToast('画像を保存しました ✓ 手動でシェアしてください');
         }
 
         btn.disabled = false;

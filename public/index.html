@@ -27,9 +27,6 @@
 
     * { box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden;}
-    @media (max-width: 480px) {
-      html, body { overflow-y: auto; }
-    }
 
     body {
       margin: 0;
@@ -68,6 +65,15 @@
     }
     .screen.active {
       opacity: 1; visibility: visible; transform: translateY(0); z-index: 10;
+    }
+    @media (max-width: 480px) {
+      .screen.active {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        max-width: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
     }
 
     /* ─── ロゴ ─── */
@@ -1061,7 +1067,9 @@
     }
     function navTo(targetId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(targetId).classList.add('active');
+      const target = document.getElementById(targetId);
+      target.classList.add('active');
+      target.scrollTop = 0;
       window.scrollTo(0, 0);
     }
 

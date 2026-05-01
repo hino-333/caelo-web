@@ -524,7 +524,7 @@
       padding-top: 1.2rem; 
       color: #444; 
       font-family: 'Zen Maru Gothic', sans-serif; 
-      text-align: justify; 
+      text-align: left; 
       word-break: normal; 
       line-break: strict; 
       overflow-wrap: break-word; 
@@ -1452,7 +1452,7 @@ ticketEl.style.width = '460px';
 ticketEl.style.maxWidth = '460px';
 
 const ticketCanvas = await html2canvas(ticketEl, {
-  backgroundColor: null, scale: 2, useCORS: true, logging: false, windowWidth: 1200
+  backgroundColor: null, scale: 2, useCORS: true, logging: false, windowWidth: 1200, width: 460
 });
 
 // 元に戻す

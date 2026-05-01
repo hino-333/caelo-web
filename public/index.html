@@ -1444,9 +1444,20 @@
         }
 
         const ticketEl = document.querySelector('#screen-result .ticket');
-        const ticketCanvas = await html2canvas(ticketEl, {
-          backgroundColor: null, scale: 2, useCORS: true, logging: false
-        });
+
+// キャプチャ前に幅を固定（スマホでの文字折り返しを防ぐ）
+const origWidth = ticketEl.style.width;
+const origMaxWidth = ticketEl.style.maxWidth;
+ticketEl.style.width = '460px';
+ticketEl.style.maxWidth = '460px';
+
+const ticketCanvas = await html2canvas(ticketEl, {
+  backgroundColor: null, scale: 2, useCORS: true, logging: false
+});
+
+// 元に戻す
+ticketEl.style.width = origWidth;
+ticketEl.style.maxWidth = origMaxWidth;
 
         const W = 1080, H = 1920;
         const finalCanvas = document.createElement('canvas');

@@ -1451,13 +1451,19 @@ const origMaxWidth = ticketEl.style.maxWidth;
 ticketEl.style.width = '460px';
 ticketEl.style.maxWidth = '460px';
 
+const commentEl = ticketEl.querySelector('.ai-comment');
+const commentText = commentEl.innerText;
+commentEl.style.visibility = 'hidden';
+
 const ticketCanvas = await html2canvas(ticketEl, {
-  backgroundColor: null, scale: 2, useCORS: true, logging: false, windowWidth: 1200, width: 460
+  backgroundColor: null, scale: 2, useCORS: true, logging: false, windowWidth: 1200
 });
 
 // 元に戻す
 ticketEl.style.width = origWidth;
 ticketEl.style.maxWidth = origMaxWidth;
+
+commentEl.style.visibility = 'visible';
 
         const W = 1080, H = 1920;
         const finalCanvas = document.createElement('canvas');
@@ -1535,7 +1541,26 @@ ticketEl.style.maxWidth = origMaxWidth;
         ctx.shadowColor = 'rgba(0, 0, 0, 0.55)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 28;
         ctx.drawImage(offCanvas, tx, ty);
         ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-
+        const wrapText = (ctx, text, x, y, maxWidth, lineHeight) => {
+  const chars = text.split('');
+  let line = '';
+  for (let i = 0; i < chars.length; i++) {
+    const testLine = line + chars[i];
+    if (ctx.measureText(testLine).width > maxWidth && line !== '') {
+      ctx.fillText(line, x, y);
+      line = chars[i];
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+};
+ctx.fillStyle = '#444444';
+ctx.font = '500 28px "Zen Maru Gothic", sans-serif';
+ctx.textAlign = 'left';
+wrapText(ctx, commentText, tx + 40, ty + targetH * 0.67, targetW - 80, 48);
+ctx.textAlign = 'center';
         ctx.fillStyle = 'rgba(232, 230, 225, 0.8)';
         ctx.font = '500 40px "Zen Maru Gothic", sans-serif';
         ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, 1680);

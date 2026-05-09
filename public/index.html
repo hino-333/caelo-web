@@ -631,6 +631,22 @@
     <div class="sfx-tutorial-highlight"></div>
   </div>
 
+  <!-- 📸 モーダル (シェア・保存用フォールバック) -->
+  <div id="fallback-share-modal" class="modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">
+    <div class="modal-content" style="background: #15171C; padding: 2.4rem 1.4rem 1.8rem; border-radius: 16px; text-align: center; position: relative; max-width: 90%; max-height: 90vh; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(226, 207, 124, 0.3);">
+      <button class="modal-close" onclick="closeModal()" style="position: absolute; top: 8px; right: 12px; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1.8rem; cursor: pointer; padding: 0;">×</button>
+      <p class="modal-title" style="color: #E8E6E1; font-weight: 700; margin: 0 0 1rem 0; font-size: 1.1rem; font-family: 'Zen Maru Gothic', sans-serif;">切符が完成しました！🎟️</p>
+      <img id="fallback-image" src="" alt="帰省切符" style="max-width: 100%; max-height: 55vh; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+      
+      <div class="modal-info" style="margin-top: 1.2rem; font-size: 0.9rem; color: rgba(232, 230, 225, 0.65); line-height: 1.5;">
+        <p style="margin-bottom: 0.5rem;"><strong style="color: #E2CF7C;">💡 Instagram等でシェアする場合</strong></p>
+        画像を<strong>長押しして保存</strong>し、アプリから<br>ストーリーズ等へ投稿してください。
+      </div>
+
+      <button class="btn" id="native-share-btn" style="margin-top: 1.2rem; padding: 0.9rem 2rem; font-size: 1rem; width: 100%;">その他のアプリでシェア</button>
+    </div>
+  </div>
+
   <div class="ambient-particles" id="ambient"></div>
 
   <div id="screen-top" class="screen active">
@@ -886,9 +902,7 @@
   <div class="toast" id="toast">画像を保存しました</div>
 
   <script>
-
     let currentAppleMusicUrl = '';
-    
     let preGeneratedShareFile = null;
 
     const moods = [
@@ -1061,8 +1075,7 @@
         this.playing = false;
       }
       async toggle() {
-        if (this.playing) this.stop();
-        else await this.play();
+        if (this.playing) this.stop(); else await this.play();
         return this.playing;
       }
     }
@@ -1112,7 +1125,7 @@
     const sfx = new SoundFx();
 
     document.addEventListener('click', (e) => {
-      const target = e.target.closest('.btn, .back-btn');
+      const target = e.target.closest('.btn, .back-btn, .modal-close');
       if (!target || target.id === 'bgm-toggle' || target.disabled) return;
       if (target.id === 'btn-next-pref') sfx.playButtonSpecial();
       else sfx.playButton();
@@ -1138,6 +1151,29 @@
       if (sfx.enabled) { sfxBtn.classList.add('enabled'); sfx.playButton(); } 
       else { sfxBtn.classList.remove('enabled'); }
     }
+
+    function closeModal() {
+      document.getElementById('fallback-share-modal').classList.remove('show');
+    }
+
+    document.getElementById('native-share-btn').addEventListener('click', async () => {
+      if (!currentShareFile) return;
+
+      if (navigator.canShare && navigator.canShare({ files: [currentShareFile] })) {
+        try {
+          await navigator.share({
+            files: [currentShareFile]
+          });
+        } catch (e) {
+          if (e.name !== 'AbortError') {
+             console.warn('Share failed:', e);
+             alert('お使いの環境では直接シェアできませんでした。長押しで保存をお願いします。');
+          }
+        }
+      } else {
+        alert('お使いのブラウザは共有機能に対応していません。画像を長押しして保存してください。');
+      }
+    });
 
     document.addEventListener('visibilitychange', () => {
       if (!bgm.ctx || !bgm.playing) return;
@@ -1339,7 +1375,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gpt-5.4-mini',
+            model: 'gpt-4o-mini',
             messages: [
               {
                 role: 'system',
@@ -1388,10 +1424,10 @@
           document.getElementById('apple-music-btn').style.display = 'none';
         }
         
-        // 🌟 修正：文字のガタツキ（スペースや改行）をJavaScriptで完全に掃除する
+        // 🌟 修正：文字のお掃除（改行やスペースを削除）
         let cleanText = resultJSON.comment;
-        cleanText = cleanText.replace(/[\r\n]+/g, ''); // 謎の改行を削除
-        cleanText = cleanText.replace(/([。、！？])\s+/g, '$1'); // 句読点の後のスペースを削除
+        cleanText = cleanText.replace(/[\r\n]+/g, ''); 
+        cleanText = cleanText.replace(/([。、！？])\s+/g, '$1'); 
         document.getElementById('result-comment').innerText = cleanText.trim();
 
         switch (weatherInfo.mood) {
@@ -1408,7 +1444,7 @@
         await sleep(800);
         navTo('screen-result');
         
-        // 🌟 修正：画面が切り替わった直後に「裏でコッソリ」シェア画像を生成しておく！
+        // 画面が切り替わった直後に「裏でコッソリ」シェア画像を生成しておく！
         prepareShareImage();
 
       } catch (error) {
@@ -1430,7 +1466,6 @@
       toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
     }
 
-    // 🌟 iOSのセキュリティ回避の要！ 画面が出た瞬間に画像を生成して変数に持たせておく関数
     async function prepareShareImage() {
       try {
         if (document.fonts && document.fonts.ready) {
@@ -1445,25 +1480,9 @@
 
         const ticketEl = document.querySelector('#screen-result .ticket');
 
-// キャプチャ前に幅を固定（スマホでの文字折り返しを防ぐ）
-const origWidth = ticketEl.style.width;
-const origMaxWidth = ticketEl.style.maxWidth;
-ticketEl.style.width = '460px';
-ticketEl.style.maxWidth = '460px';
-
-const commentEl = ticketEl.querySelector('.ai-comment');
-const commentText = commentEl.innerText;
-commentEl.style.visibility = 'hidden';
-
-const ticketCanvas = await html2canvas(ticketEl, {
-  backgroundColor: null, scale: 2, useCORS: true, logging: false, windowWidth: 1200
-});
-
-// 元に戻す
-ticketEl.style.width = origWidth;
-ticketEl.style.maxWidth = origMaxWidth;
-
-commentEl.style.visibility = 'visible';
+        const ticketCanvas = await html2canvas(ticketEl, {
+          backgroundColor: null, scale: 2, useCORS: true, logging: false, windowWidth: 1200
+        });
 
         const W = 1080, H = 1920;
         const finalCanvas = document.createElement('canvas');
@@ -1541,26 +1560,7 @@ commentEl.style.visibility = 'visible';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.55)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 28;
         ctx.drawImage(offCanvas, tx, ty);
         ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-        const wrapText = (ctx, text, x, y, maxWidth, lineHeight) => {
-  const chars = text.split('');
-  let line = '';
-  for (let i = 0; i < chars.length; i++) {
-    const testLine = line + chars[i];
-    if (ctx.measureText(testLine).width > maxWidth && line !== '') {
-      ctx.fillText(line, x, y);
-      line = chars[i];
-      y += lineHeight;
-    } else {
-      line = testLine;
-    }
-  }
-  ctx.fillText(line, x, y);
-};
-ctx.fillStyle = '#444444';
-ctx.font = '500 28px "Zen Maru Gothic", sans-serif';
-ctx.textAlign = 'left';
-wrapText(ctx, commentText, tx + 40, ty + targetH - 200, targetW - 80, 48);
-ctx.textAlign = 'center';
+
         ctx.fillStyle = 'rgba(232, 230, 225, 0.8)';
         ctx.font = '500 40px "Zen Maru Gothic", sans-serif';
         ctx.fillText('ふるさとと、音楽で繋がる旅。', W / 2, 1680);
@@ -1577,9 +1577,8 @@ ctx.textAlign = 'center';
       }
     }
 
-    // 🌟 シェアボタンが押された時の処理（画像はすでに出来ているので0秒で開く！）
+    // シェアボタンが押された時の処理
     async function shareTicket() {
-      // もし画像の事前生成がまだ終わっていなかった場合
       if (!preGeneratedShareFile) {
         showToast('シェア用の切符を準備中です。少し待ってからもう一度押してね！');
         return;
@@ -1587,7 +1586,6 @@ ctx.textAlign = 'center';
 
       let shared = false;
       
-      // 事前生成された画像を使って、0秒でシェアシートを呼び出す
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [preGeneratedShareFile] })) {
         try {
           await navigator.share({
@@ -1596,14 +1594,13 @@ ctx.textAlign = 'center';
           shared = true;
         } catch (e) {
           if (e.name === 'AbortError') {
-            shared = true; // ユーザーが自分で「×」を押して閉じただけなので正常
+            shared = true;
           } else {
             console.warn('Share failed:', e);
           }
         }
       }
 
-      // 何らかの理由でシェアシートが開かなかった場合の最終手段（ダウンロードさせる）
       if (!shared) { 
         const url = URL.createObjectURL(preGeneratedShareFile);
         const a = document.createElement('a');

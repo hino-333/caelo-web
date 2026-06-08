@@ -261,8 +261,8 @@
     .bgm-toggle.playing .eq-bar:nth-child(3) { animation-delay: -0.1s; }
     .bgm-toggle.playing .eq-bar:nth-child(4) { animation-delay: -0.5s; }
     @keyframes eq-dance {
-      0%, 100% { height: 4px;  y: 10px; }
-      50%      { height: 16px; y: 4px;  }
+      0%, 100% { height: 5px;  y: 9.5px; }
+      50%      { height: 12px; y: 6px;   }
     }
 
     /* 🔊 効果音ボタン */
@@ -598,10 +598,10 @@
 
   <button id="bgm-toggle" class="bgm-toggle" onclick="toggleBGM()" aria-label="BGMの再生切り替え" title="BGM">
     <svg class="bgm-eq" viewBox="0 0 24 24" aria-hidden="true">
-      <rect class="eq-bar" x="5.53"  y="9"  width="2" height="6" rx="1"/>
-      <rect class="eq-bar" x="9.18"  y="8"  width="2" height="8" rx="1"/>
-      <rect class="eq-bar" x="12.82" y="9"  width="2" height="6" rx="1"/>
-      <rect class="eq-bar" x="16.47" y="10" width="2" height="4" rx="1"/>
+      <rect class="eq-bar" x="2.02"  y="8.5" width="3" height="7" rx="1.5"/>
+      <rect class="eq-bar" x="7.67"  y="7.5" width="3" height="9" rx="1.5"/>
+      <rect class="eq-bar" x="13.33" y="8.5" width="3" height="7" rx="1.5"/>
+      <rect class="eq-bar" x="18.98" y="9.5" width="3" height="5" rx="1.5"/>
     </svg>
     <span class="bgm-hint" aria-hidden="true"></span>
   </button>

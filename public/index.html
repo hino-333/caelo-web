@@ -243,34 +243,26 @@
       0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,0.3), 0 0 14px rgba(226, 207, 124, 0.18); }
       50%      { box-shadow: 0 4px 14px rgba(0,0,0,0.3), 0 0 26px rgba(226, 207, 124, 0.42); }
     }
-    .bgm-bars {
-      display: flex; align-items: center; justify-content: center;
-      gap: 2.5px; height: 16px; width: 22px;
-    }
-    .bgm-bars span {
-      display: block; width: 2.5px; background: currentColor;
-      border-radius: 1.5px; transition: height 0.4s ease;
-    }
-    .bgm-toggle:not(.playing) .bgm-bars span:nth-child(1) { height: 35%; }
-    .bgm-toggle:not(.playing) .bgm-bars span:nth-child(2) { height: 60%; }
-    .bgm-toggle:not(.playing) .bgm-bars span:nth-child(3) { height: 45%; }
-    .bgm-toggle:not(.playing) .bgm-bars span:nth-child(4) { height: 25%; }
+    /* 🎵 BGMバー（自作SVG aicon-05）。
+       先端の丸を保つため scaleY ではなく height/y を直接アニメ → rx 一定で歪まない */
+    .bgm-eq { width: 24px; height: 24px; display: block; overflow: visible; }
+    .bgm-eq .eq-bar { fill: currentColor; }
     .bgm-toggle:not(.playing)::after {
       content: ''; position: absolute; top: 50%; left: 50%;
       width: 28px; height: 1.5px; background: currentColor;
       border-radius: 1px; transform: translate(-50%, -50%) rotate(-45deg);
       opacity: 0.55; pointer-events: none;
     }
-    .bgm-toggle.playing .bgm-bars span {
-      animation: bars-dance 1s ease-in-out infinite;
+    .bgm-toggle.playing .eq-bar {
+      animation: eq-dance 1s ease-in-out infinite;
     }
-    .bgm-toggle.playing .bgm-bars span:nth-child(1) { animation-delay: -0.3s; }
-    .bgm-toggle.playing .bgm-bars span:nth-child(2) { animation-delay: -0.7s; }
-    .bgm-toggle.playing .bgm-bars span:nth-child(3) { animation-delay: -0.1s; }
-    .bgm-toggle.playing .bgm-bars span:nth-child(4) { animation-delay: -0.5s; }
-    @keyframes bars-dance {
-      0%, 100% { height: 22%; }
-      50%      { height: 88%; }
+    .bgm-toggle.playing .eq-bar:nth-child(1) { animation-delay: -0.3s; }
+    .bgm-toggle.playing .eq-bar:nth-child(2) { animation-delay: -0.7s; }
+    .bgm-toggle.playing .eq-bar:nth-child(3) { animation-delay: -0.1s; }
+    .bgm-toggle.playing .eq-bar:nth-child(4) { animation-delay: -0.5s; }
+    @keyframes eq-dance {
+      0%, 100% { height: 4px;  y: 10px; }
+      50%      { height: 16px; y: 4px;  }
     }
 
     /* 🔊 効果音ボタン */
@@ -605,9 +597,12 @@
 <body>
 
   <button id="bgm-toggle" class="bgm-toggle" onclick="toggleBGM()" aria-label="BGMの再生切り替え" title="BGM">
-    <div class="bgm-bars" aria-hidden="true">
-      <span></span><span></span><span></span><span></span>
-    </div>
+    <svg class="bgm-eq" viewBox="0 0 24 24" aria-hidden="true">
+      <rect class="eq-bar" x="5.53"  y="9"  width="2" height="6" rx="1"/>
+      <rect class="eq-bar" x="9.18"  y="8"  width="2" height="8" rx="1"/>
+      <rect class="eq-bar" x="12.82" y="9"  width="2" height="6" rx="1"/>
+      <rect class="eq-bar" x="16.47" y="10" width="2" height="4" rx="1"/>
+    </svg>
     <span class="bgm-hint" aria-hidden="true"></span>
   </button>
 

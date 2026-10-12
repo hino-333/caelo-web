@@ -1309,7 +1309,7 @@
 
     function getWeatherInfo(code, isDay) {
       const day = isDay !== 0; let text, mood;
-      if (code === 0) { text = day ? '澄んだ青空' : '満点の星空'; mood = day ? 'sunny' : 'starry'; }
+      if (code === 0) { text = day ? '澄んだ青空' : '満天の星空'; mood = day ? 'sunny' : 'starry'; }
       else if (code <= 2) { text = day ? '穏やかな晴れ間' : '月明かりの夜'; mood = day ? 'sunny' : 'starry'; }
       else if (code === 3) { text = day ? '優しい曇り空' : '雲に覆われた夜'; mood = 'cloudy'; }
       else if (code <= 48) { text = day ? '霧で霞んだ空' : '霧の立ちこめる夜'; mood = 'foggy'; }

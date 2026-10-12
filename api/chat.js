@@ -1,7 +1,8 @@
 // 許可オリジン（本番・プレビュー・ローカル開発）
-const ALLOWED_ORIGINS = ['https://caelo-web.vercel.app'];
+const ALLOWED_ORIGINS = ['https://caelo-web.vercel.app', 'https://caelo-wayhome.vercel.app'];
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https:\/\/caelo-web-[a-z0-9-]+\.vercel\.app$/,
+  /^https:\/\/caelo-wayhome-[a-z0-9-]+\.vercel\.app$/,
   /^http:\/\/localhost(:\d+)?$/,
   /^http:\/\/127\.0\.0\.1(:\d+)?$/,
 ];

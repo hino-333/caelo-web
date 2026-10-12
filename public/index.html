@@ -1327,7 +1327,7 @@
     }
 
     async function startHomecoming() {
-      const selectedMoodArray = Array.from(document.querySelectorAll('.mood-tag.selected')).map(t => t.innerText);
+      const selectedMoodArray = Array.from(document.querySelectorAll('.mood-tag.selected')).map(t => t.textContent.trim());
       const moodText = selectedMoodArray.join('、');
       const passengerName = nicknameInput.value.trim();
       const prefData = document.getElementById('pref-select').value.split(',');

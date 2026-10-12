@@ -1346,25 +1346,29 @@
         const weatherData = await weatherRes.json();
         const weatherInfo = getWeatherInfo(weatherData.current_weather.weathercode, weatherData.current_weather.is_day);
         const weatherString = weatherInfo.text;
-        
+
+        // 選曲はサーバー側で。最近届いた曲を渡して、同じ曲が続かないようにする
+        // 天気が分かった時点で頼んでおき、空模様の案内を見ている間に選んでもらう
+        const recent = loadRecentSongs();
+        const songPicked = (async () => {
+          const aiResponse = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mood: moodText, pref: prefName, weather: weatherString, avoid: recent })
+          });
+          const aiData = await aiResponse.json();
+          if (aiData.error) throw new Error(aiData.error.message || aiData.error);
+          return chooseSong(aiData.songs, recent);
+        })();
+        songPicked.catch(() => {}); // 失敗は下の await で受け取る
+
         await sleep(1800);
         setSkyTheme(getTimeOfDay(), weatherInfo.mood);
         await setLoading(`どうやら今の${prefName}は<br>「${weatherString}」のようです`);
         await sleep(2200);
         await setLoading(`今のあなたの気分と、<br>${prefName}の空気を繋ぐ音楽を探しています...`);
 
-        // 選曲はサーバー側で。最近届いた曲を渡して、同じ曲が続かないようにする
-        const recent = loadRecentSongs();
-        const aiResponse = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mood: moodText, pref: prefName, weather: weatherString, avoid: recent })
-        });
-
-        const aiData = await aiResponse.json();
-        if (aiData.error) throw new Error(aiData.error.message || aiData.error);
-
-        const { song: resultJSON, track } = await chooseSong(aiData.songs, recent);
+        const { song: resultJSON, track } = await songPicked;
         rememberSong(resultJSON);
 
         document.getElementById('ticket-name').innerText    = passengerName;
@@ -1420,6 +1424,10 @@
       const x = n(a), y = n(b);
       return !!x && !!y && (x.includes(y) || y.includes(x));
     };
+    const sameTitle = (a, b) => {
+      const n = s => (s || '').normalize('NFKC').toLowerCase().replace(/[\s・'’"“”()（）\[\]「」『』\-‐–—]/g, '');
+      return n(a) === n(b);
+    };
     function loadRecentSongs() {
       try {
         const list = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
@@ -1448,7 +1456,9 @@
             const res = await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&country=jp&limit=5`);
             const data = await res.json();
             const results = data.results || [];
-            const track = results.find(t => sameText(t.artistName, song.artist) && sameText(t.trackName, song.title));
+            const byArtist = results.filter(t => sameText(t.artistName, song.artist) && sameText(t.trackName, song.title));
+            // ライブ版や別録りより、曲名がそのまま一致する元の曲を選ぶ
+            const track = byArtist.find(t => sameTitle(t.trackName, song.title)) || byArtist[0];
             if (track) return { song, track };
             if (!close && results[0] && sameText(results[0].trackName, song.title)) close = { song, track: results[0] };
           } catch (e) { /* 次の候補へ */ }

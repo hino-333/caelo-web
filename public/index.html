@@ -1353,62 +1353,26 @@
         await sleep(2200);
         await setLoading(`今のあなたの気分と、<br>${prefName}の空気を繋ぐ音楽を探しています...`);
 
-        const genreHints = [
-          '90年代J-POPの心に染みる名曲', '2000年代の懐かしいヒット曲', '2010年代の隠れた名曲', '2020年代の隠れた名曲',
-          '有名アーティストのファンに愛される名曲', '夜に聴きたいシティポップ', 
-          '日本の女性シンガーソングライターの定番曲', '日本の男性シンガーソングライターのエモい曲', 
-          'アコースティックな邦楽', '日本のオルタナティヴ・ロック（邦ロック）の定番', 
-          'エモいJ-Rock', '昭和歌謡・平成レトロな名曲', 'チル系の邦楽（深夜に合う）', 
-          '最近の邦楽（少し落ち着いた曲）', '日本のネオソウル/R&B', 
-          'ピアノが美しい邦楽', 'ボカロP出身アーティストのエモーショナルな楽曲',
-          'アニメ・映画主題歌の心に残る名曲(邦楽)'
-        ];
-        const randomGenre = genreHints[Math.floor(Math.random() * genreHints.length)];
-        const randomSeed  = Math.floor(Math.random() * 1000000);
-
+        // 選曲はサーバー側で。最近届いた曲を渡して、同じ曲が続かないようにする
+        const recent = loadRecentSongs();
         const aiResponse = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              {
-                role: 'system',
-                content: `あなたはユーザーに「帰る場所」を提供する、音楽への愛が深いDJです。
-【絶対ルール】
-1. あなたの選曲アルゴリズムのランダムシード値は[${randomSeed}]です。毎回異なるアーティスト・楽曲を選んでください。
-2. 知名度のバランスが命です。Mr.Childrenの「口笛」のような【ある程度知名度はあるが、ベタすぎない絶妙なライン】を狙って選曲してください。
-3. 今回は【${randomGenre}】のジャンルや雰囲気を隠し味として意識してください。
-4. ユーザーはその曲をApple Musicで検索しますので、正確な曲名とアーティスト名を提供してください。
-5. 楽曲は9割以上の確率で日本語の歌詞の邦楽から選んでください。
-6. コメントは故郷の情景を交え、地元の旧友からの手紙のように温かく80文字程度で。
-【重要】手紙の中に、ユーザーが選んだ気分（嬉しい、疲れたなど）の言葉をそのまま使ったり、「〇〇な日は〜」と反復することは絶対に行わないでください。自然な話し言葉の励ましに変換してください。
-【超重要】アルバム名ではなく、必ず単一の「楽曲名（1曲）」を選曲してください。
-必ず以下のJSONフォーマットのみで返答してください。 {"artist": "アーティスト名", "title": "曲名", "comment": "手紙のような温かいコメント"}`
-              },
-              { role: 'user', content: `私の気分は「${moodText}」、故郷は「${prefName}」、故郷の今の天気は「${weatherString}」です。私にぴったりな1曲を選んでください。` }
-            ],
-            temperature: 1.15,
-            response_format: { type: "json_object" }
-          })
+          body: JSON.stringify({ mood: moodText, pref: prefName, weather: weatherString, avoid: recent })
         });
 
         const aiData = await aiResponse.json();
-        if (aiData.error) throw new Error(aiData.error.message);
+        if (aiData.error) throw new Error(aiData.error.message || aiData.error);
 
-        const resultJSON = JSON.parse(aiData.choices[0].message.content);
-        
-        const searchQuery = encodeURIComponent(`${resultJSON.artist} ${resultJSON.title}`);
-        const itunesResponse = await fetch(`https://itunes.apple.com/search?term=${searchQuery}&entity=song&country=jp&limit=1`);
-        const itunesData = await itunesResponse.json();
+        const { song: resultJSON, track } = await chooseSong(aiData.songs, recent);
+        rememberSong(resultJSON);
 
         document.getElementById('ticket-name').innerText    = passengerName;
         document.getElementById('ticket-dest').innerText    = prefName;
         document.getElementById('ticket-weather').innerText = weatherString;
         document.getElementById('ticket-time').innerText    = nowHHMM();
         
-        if (itunesData.results && itunesData.results.length > 0) {
-          const track = itunesData.results[0];
+        if (track) {
           document.getElementById('result-title').innerText   = track.trackName;
           document.getElementById('result-artist').innerText  = track.artistName;
           currentAppleMusicUrl = track.trackViewUrl;
@@ -1447,6 +1411,51 @@
         alert('エラーが発生しました\n' + error.message);
         navTo('screen-top');
       }
+    }
+
+    // ===== 最近届いた曲（同じ曲が続かないように覚えておく） =====
+    const RECENT_KEY = 'caeloRecentSongs', RECENT_MAX = 20;
+    const sameText = (a, b) => {
+      const n = s => (s || '').normalize('NFKC').toLowerCase().replace(/[\s・'’"“”()（）\[\]「」『』\-‐–—]/g, '');
+      const x = n(a), y = n(b);
+      return !!x && !!y && (x.includes(y) || y.includes(x));
+    };
+    function loadRecentSongs() {
+      try {
+        const list = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+        return Array.isArray(list) ? list.slice(-RECENT_MAX) : [];
+      } catch (e) { return []; }
+    }
+    function rememberSong(song) {
+      try {
+        const list = loadRecentSongs().filter(s => !(sameText(s.artist, song.artist) && sameText(s.title, song.title)));
+        list.push({ artist: song.artist, title: song.title });
+        localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(-RECENT_MAX)));
+      } catch (e) { /* 保存できなくても選曲は続ける */ }
+    }
+    // 候補の中から、最近届いていない・Apple Musicで見つかる曲をランダムに選ぶ
+    async function chooseSong(songs, recent) {
+      if (!Array.isArray(songs) || !songs.length) throw new Error('曲が見つかりませんでした');
+      const heard = s => recent.some(r => sameText(r.artist, s.artist) && sameText(r.title, s.title));
+      const shuffled = songs.slice().sort(() => Math.random() - 0.5);
+      const fresh = shuffled.filter(s => !heard(s)), again = shuffled.filter(heard);
+      // アーティスト名の表記ゆれ（英字とカナなど）で外さないよう、曲名だけ合う候補も使う。まだ届いていない曲を先に
+      for (const group of [fresh, again]) {
+        let close = null;
+        for (const song of group) {
+          try {
+            const term = encodeURIComponent(`${song.artist} ${song.title}`);
+            const res = await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&country=jp&limit=5`);
+            const data = await res.json();
+            const results = data.results || [];
+            const track = results.find(t => sameText(t.artistName, song.artist) && sameText(t.trackName, song.title));
+            if (track) return { song, track };
+            if (!close && results[0] && sameText(results[0].trackName, song.title)) close = { song, track: results[0] };
+          } catch (e) { /* 次の候補へ */ }
+        }
+        if (close) return close;
+      }
+      return { song: fresh[0] || again[0], track: null };
     }
 
     function openAppleMusic() {

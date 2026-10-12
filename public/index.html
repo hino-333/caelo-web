@@ -1453,7 +1453,7 @@
         for (const song of group) {
           try {
             const term = encodeURIComponent(`${song.artist} ${song.title}`);
-            const res = await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&country=jp&limit=5`);
+            const res = await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&country=jp&limit=15`);
             const data = await res.json();
             const results = data.results || [];
             const byArtist = results.filter(t => sameText(t.artistName, song.artist) && sameText(t.trackName, song.title));

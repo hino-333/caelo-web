@@ -1480,6 +1480,30 @@
       toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
     }
 
+    // シェア画像用に複製した切符を、画面で見えている姿に揃える
+    function prepareTicketClone(doc) {
+      // 複製では浮き上がるアニメーションが最初から再生され、傾いて薄い途中の姿が写ってしまう
+      const still = doc.createElement('style');
+      still.textContent = '#screen-result .ticket-wrapper, #screen-result .ticket { animation: none !important; transform: none !important; opacity: 1 !important; }';
+      doc.head.appendChild(still);
+      // html2canvas は repeating-linear-gradient を描けないので、バーコードを細い線の要素で組み直す
+      const barcode = doc.querySelector('#screen-result .barcode');
+      if (barcode) {
+        const color = doc.defaultView.getComputedStyle(doc.querySelector('#screen-result .ticket')).color;
+        barcode.style.background = 'none';
+        barcode.style.position = 'relative';
+        barcode.style.overflow = 'hidden';
+        const width = barcode.getBoundingClientRect().width;
+        for (let x = 0; x < width; x += 14) {
+          for (const [from, to] of [[0, 2], [4, 5], [9, 12]]) {
+            const bar = doc.createElement('span');
+            bar.style.cssText = `position:absolute; top:0; bottom:0; left:${x + from}px; width:${to - from}px; background:${color};`;
+            barcode.appendChild(bar);
+          }
+        }
+      }
+    }
+
     async function prepareShareImage() {
       try {
         if (document.fonts && document.fonts.ready) {
@@ -1494,8 +1518,9 @@
 
         const ticketEl = document.querySelector('#screen-result .ticket');
 
+        // 画面と同じ幅のまま写す（幅を変えると、内側の枠だけ元の大きさで残り、改行もずれる）
         const ticketCanvas = await html2canvas(ticketEl, {
-          backgroundColor: null, scale: 2, useCORS: true, logging: false, windowWidth: 1200
+          backgroundColor: null, scale: 2, useCORS: true, logging: false, onclone: prepareTicketClone
         });
 
         const W = 1080, H = 1920;

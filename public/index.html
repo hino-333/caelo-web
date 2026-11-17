@@ -545,7 +545,7 @@
       clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
     }
     /* 縦の長さに合わせて伸び縮み：演出の舞台が残りの高さを使い、ロゴの下と3点の上には画面に比例した余白をとる */
-    #screen-top { display: flex; flex-direction: column; min-height: 100dvh; padding-bottom: calc(env(safe-area-inset-bottom) + clamp(1.2rem, 10vh, 6.4rem)); }
+    #screen-top { display: flex; flex-direction: column; min-height: 100dvh; padding-bottom: calc(env(safe-area-inset-bottom) + clamp(1.6rem, 12vh, 6.6rem)); }
     #screen-top .logo-container { margin-bottom: clamp(0.8rem, 5vh, 2.8rem); flex-shrink: 0; }
     #screen-top > .btn { flex-shrink: 0; }
     .intro { margin: 0 -1.8rem; flex: 1; display: flex; flex-direction: column; min-height: 0; }
@@ -766,13 +766,17 @@
       #screen-top .brand-subtitle { font-size: 0.76rem; padding-top: 0.1rem; }
       .intro-title { font-size: 1.08rem; margin: 0.6rem 0 0.35rem; }
       .intro-desc { font-size: 0.74rem; line-height: 1.6; }
-      #screen-top > .btn { padding: 0.85rem 2rem; }
+    }
+    /* 「帰省する」の位置は変えない：縦が短い画面でも下の余白はこれまでどおり */
+    @media (max-height: 700px) {
+      #screen-top { padding-bottom: calc(env(safe-area-inset-bottom) + 1.6rem); }
     }
     /* アプリ内ブラウザのように、縦が特に短いとき：余白を詰めて、見出しと説明が必ず見えるように */
     @media (max-height: 600px) {
-      #screen-top { padding-top: 1rem; padding-bottom: calc(env(safe-area-inset-bottom) + 0.9rem); }
+      #screen-top { padding-top: 1rem; }
       #screen-top .logo-container { margin-bottom: 0.5rem; }
       .intro-dots { margin: 0.3rem 0 0; }
+      .intro-stage { min-height: 96px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .main-logo, .ambient-particles span, .stars span, .shooting-star,

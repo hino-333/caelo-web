@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 
   <style>
     :root {
@@ -112,10 +113,6 @@
     p.lead {
       font-size: 1rem; line-height: 1.95; margin: 0 auto 1rem;
       color: var(--text-muted); max-width: 360px;
-    }
-    p.lead-note {
-      font-size: 0.84rem; line-height: 1.75; margin: 0 auto 2.4rem;
-      color: rgba(232, 230, 225, 0.4); max-width: 360px; letter-spacing: 0.03em;
     }
 
     .back-btn {
@@ -529,16 +526,6 @@
     }
     .apple-icon { width: 19px; height: 19px; vertical-align: middle; margin-right: 0.5rem; margin-top: -3px; }
 
-    /* How it works */
-    .how-it-works {
-      margin: 0 auto 2.2rem; max-width: 380px; display: flex; flex-direction: column; gap: 0.85rem;
-      padding: 1.4rem 1.2rem; background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px; text-align: left; position: relative;
-    }
-    .how-title { font-family: 'Zen Maru Gothic', sans-serif; font-size: 0.92rem; letter-spacing: 0.3em; color: var(--accent-color); font-weight: 700; text-align: center; margin-bottom: 0.4rem; opacity: 0.85; }
-    .step { display: flex; align-items: center; gap: 0.95rem; }
-    .step-number { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: rgba(226, 207, 124, 0.1); border: 1px solid rgba(226, 207, 124, 0.45); color: var(--accent-color); font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(226, 207, 124, 0.12); }
-    .step-text { font-size: 0.92rem; color: rgba(232, 230, 225, 0.82); line-height: 1.55; }
-    .step-text strong { color: var(--accent-color); font-weight: 700; }
 
     .btn .icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem; margin-top: -3px; }
 
@@ -551,20 +538,199 @@
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+
+    /* ─── ファーストビュー：3ステップの体験カルーセル ─── */
+    .visually-hidden {
+      position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    #screen-top .logo-container { margin-bottom: 0.4rem; }
+    .intro { margin: 0 -1.8rem; }
+    .intro-track {
+      display: flex; overflow-x: auto; overflow-y: hidden;
+      scroll-snap-type: x mandatory; scrollbar-width: none;
+      overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; outline: none;
+    }
+    .intro-track::-webkit-scrollbar { display: none; }
+    .intro-track:focus-visible { box-shadow: inset 0 0 0 2px rgba(226, 207, 124, 0.5); border-radius: 16px; }
+    .intro-slide {
+      flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always;
+      padding: 0 1.8rem; display: flex; flex-direction: column; align-items: center;
+    }
+    .intro-stage {
+      position: relative; width: 100%; max-width: 360px;
+      height: clamp(196px, 31vh, 250px); margin: 0 auto;
+    }
+    #intro-stage-mood {
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22px);
+      mask-image: linear-gradient(180deg, transparent 0, #000 22px);
+    }
+    .intro-caption { transition: none; will-change: opacity; }
+    .intro-title {
+      font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; color: var(--accent-color);
+      font-size: 1.22rem; letter-spacing: 0.05em; margin: 1rem 0 0.5rem; line-height: 1.5;
+      text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere;
+    }
+    .intro-desc {
+      font-size: 0.8rem; line-height: 1.75; letter-spacing: 0.04em; margin: 0;
+      color: var(--text-main); opacity: 0.85; text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere;
+    }
+    .intro-dots { display: flex; justify-content: center; margin: 1.1rem 0 0.9rem; }
+    .intro-dot {
+      width: 28px; height: 44px; padding: 0; border: none; background: none; cursor: pointer;
+      display: grid; place-items: center; -webkit-tap-highlight-color: transparent;
+    }
+    .intro-dot::before {
+      content: ''; width: 11px; height: 11px; border-radius: 50%;
+      background: rgba(232, 230, 225, 0.26);
+      transition: background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .intro-dot.active::before { background: var(--accent-color); transform: scale(1.08); box-shadow: 0 0 10px rgba(226, 207, 124, 0.45); }
+    .intro-dot:focus-visible { outline: none; }
+    .intro-dot:focus-visible::before { box-shadow: 0 0 0 3px rgba(226, 207, 124, 0.45); }
+
+    /* フェーズ1：降ってくる気分タグ */
+    .intro-tag {
+      position: absolute; left: 0; top: 0; margin: 0; white-space: nowrap;
+      touch-action: none; will-change: transform; cursor: grab;
+      background: rgba(52, 55, 66, 0.92); border-color: rgba(255, 255, 255, 0.16);
+      transition: background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1), color 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .intro-tag:hover { background: rgba(62, 65, 77, 0.95); transform: none; }
+    .intro-tag.dragging { cursor: grabbing; }
+    .intro-tag.selected {
+      background: var(--accent-color); color: #1E2024; border-color: var(--accent-color); font-weight: 700;
+      box-shadow: 0 0 18px rgba(226, 207, 124, 0.55), 0 6px 18px rgba(226, 207, 124, 0.3);
+    }
+
+    /* フェーズ2：ふるさとを選ぶ → 天気が届く */
+    .wx { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .wx-sky {
+      position: relative; width: min(230px, 78%); height: 46%; border-radius: 18px; overflow: hidden;
+      background: linear-gradient(180deg, #1a1f33 0%, #232a42 100%);
+      border: 1px solid rgba(226, 207, 124, 0.22);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .wx-scene { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+    .wx-scene.on { opacity: 1; }
+    .wx-scene[data-kind="snow"] { background: linear-gradient(180deg, #2a3452 0%, #46557a 70%, #5b6a8e 100%); }
+    .wx-scene[data-kind="sun"]  { background: linear-gradient(180deg, #3a8ad4 0%, #62a8e8 55%, #90c4f5 100%); }
+    .wx-scene[data-kind="rain"] { background: linear-gradient(180deg, #3c4352 0%, #4f5866 55%, #66717c 100%); }
+    .wx-flake, .wx-drop { position: absolute; top: -8px; pointer-events: none; }
+    .wx-flake { background: rgba(255, 255, 255, 0.9); border-radius: 50%; animation: wx-snow linear infinite; }
+    .wx-drop { width: 1px; background: rgba(190, 215, 255, 0.7); border-radius: 1px; animation: wx-rain linear infinite; }
+    @keyframes wx-snow {
+      0% { transform: translate(0, 0); opacity: 0; } 12% { opacity: 1; }
+      100% { transform: translate(12px, 130px); opacity: 0.6; }
+    }
+    @keyframes wx-rain {
+      0% { transform: translateY(0) rotate(10deg); opacity: 0; } 10% { opacity: 1; }
+      100% { transform: translateY(130px) rotate(10deg); opacity: 0.5; }
+    }
+    .wx-sun {
+      position: absolute; top: 16px; right: 24px; width: 30px; height: 30px; border-radius: 50%;
+      background: radial-gradient(circle, #fff6c8 0%, #ffdf6a 55%, #f5c63c 100%);
+      box-shadow: 0 0 22px rgba(255, 220, 80, 0.75), 0 0 46px rgba(255, 200, 40, 0.35);
+    }
+    .wx-cloud { position: absolute; background: rgba(255, 255, 255, 0.92); border-radius: 999px; }
+    .wx-label {
+      position: absolute; left: 14px; bottom: 11px; display: flex; align-items: baseline; gap: 0.45rem;
+      color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+      opacity: 0; transform: translateY(6px);
+      transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .wx-scene.on .wx-label { opacity: 1; transform: none; transition-delay: 0.18s; }
+    .wx-word { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.04em; }
+    .wx-temp { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.02em; }
+    .wx-signal { position: relative; width: 8px; height: 18%; margin: 0.15rem 0; }
+    .wx-signal span {
+      position: absolute; left: 1px; bottom: 0; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-color); box-shadow: 0 0 8px rgba(226, 207, 124, 0.8); opacity: 0;
+    }
+    .wx-signal.go span { animation: wx-rise 0.7s cubic-bezier(0.45, 0, 0.25, 1) forwards; }
+    .wx-signal.go span:nth-child(2) { animation-delay: 0.12s; }
+    .wx-signal.go span:nth-child(3) { animation-delay: 0.24s; }
+    @keyframes wx-rise {
+      0% { transform: translateY(0) scale(0.6); opacity: 0; } 25% { opacity: 1; }
+      100% { transform: translateY(calc(-1 * var(--rise, 40px))) scale(1); opacity: 0; }
+    }
+    .wx-pick {
+      display: inline-flex; align-items: center; gap: 0.5rem; height: 40px; padding: 0 1rem 0 0.85rem;
+      border-radius: 14px; background: var(--tag-bg); border: 1px solid var(--tag-border);
+      color: var(--text-main); font-size: 0.95rem; overflow: hidden;
+      transition: border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.45s, box-shadow 0.45s, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .wx-pick.tap {
+      border-color: var(--accent-color); background: rgba(226, 207, 124, 0.08);
+      box-shadow: 0 0 0 4px rgba(226, 207, 124, 0.08); transform: scale(0.97);
+    }
+    .wx-pick svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--accent-color); }
+    .wx-town-box { position: relative; height: 1.5em; min-width: 4.6em; overflow: hidden; text-align: left; }
+    .wx-town {
+      position: absolute; left: 0; top: 0; line-height: 1.5em; white-space: nowrap;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .wx-town.out { transform: translateY(-100%); opacity: 0; }
+    .wx-town.in { transform: translateY(100%); opacity: 0; }
+
+    /* フェーズ3：広がる3枚の切符 */
+    .mt-stack { position: absolute; left: 50%; top: 50%; width: 0; height: 0; --spread: 84px; }
+    .mt {
+      position: absolute; left: 0; top: 0; width: 112px; height: 146px; margin: -73px 0 0 -56px;
+      transform: translate(0, 0) rotate(var(--r0, 0deg)) scale(0.96); opacity: 0;
+      transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.5));
+    }
+    .mt.l { --r0: -3deg; z-index: 1; } .mt.c { z-index: 3; } .mt.r { --r0: 3deg; z-index: 2; }
+    .mt-stack.shown .mt { opacity: 1; transform: translate(0, 0) rotate(var(--r0, 0deg)) scale(1); }
+    .mt-stack.spread .mt.l { transform: translate(calc(-1 * var(--spread)), 10px) rotate(-12deg); }
+    .mt-stack.spread .mt.c { transform: translate(0, -6px) rotate(0deg); transition-delay: 0.04s; }
+    .mt-stack.spread .mt.r { transform: translate(var(--spread), 10px) rotate(12deg); transition-delay: 0.08s; }
+    .mt-stack.instant .mt { transition: none !important; }
+    .mt-float { width: 100%; height: 100%; }
+    .mt-stack.spread .mt-float { animation: mt-float 4.6s ease-in-out infinite; }
+    .mt.l .mt-float { animation-delay: -1.4s !important; } .mt.r .mt-float { animation-delay: -2.9s !important; }
+    @keyframes mt-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    .mt-paper {
+      position: relative; width: 100%; height: 100%; border-radius: 10px; padding: 13px 12px 10px;
+      background-color: var(--ticket-bg); color: var(--ticket-text); text-align: left;
+      background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.012) 0 2px, transparent 2px 4px);
+      -webkit-mask-image: radial-gradient(circle at 0 64%, transparent 7px, black 7.5px), radial-gradient(circle at 100% 64%, transparent 7px, black 7.5px);
+      -webkit-mask-composite: source-in;
+      mask-image: radial-gradient(circle at 0 64%, transparent 7px, black 7.5px), radial-gradient(circle at 100% 64%, transparent 7px, black 7.5px);
+      mask-composite: intersect;
+    }
+    .mt-paper::before {
+      content: ''; position: absolute; inset: 7px; border: 1px solid rgba(0, 0, 0, 0.07); border-radius: 5px; pointer-events: none;
+    }
+    .mt-label { font-family: 'Nunito', sans-serif; font-size: 0.48rem; font-weight: 700; letter-spacing: 0.18em; color: #999; }
+    .mt-title { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 0.95rem; margin-top: 0.28rem; line-height: 1.3; }
+    .mt-artist { font-family: 'Zen Maru Gothic', sans-serif; font-size: 0.56rem; color: #6a6a6a; margin-top: 0.15rem; }
+    .mt-rule { position: absolute; left: 12px; right: 12px; top: 64%; border-top: 1px dashed rgba(0, 0, 0, 0.22); }
+    .mt-barcode {
+      position: absolute; left: 12px; right: 38px; bottom: 12px; height: 13px; opacity: 0.7;
+      background: repeating-linear-gradient(90deg, var(--ticket-text) 0 1.5px, transparent 1.5px 3px, var(--ticket-text) 3px 4px, transparent 4px 6.5px, var(--ticket-text) 6.5px 8.5px, transparent 8.5px 10px);
+    }
+    .mt-stamp {
+      position: absolute; bottom: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%;
+      border: 1.2px solid rgba(180, 60, 60, 0.5); color: rgba(180, 60, 60, 0.65);
+      font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 0.36rem; line-height: 1.15;
+      display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(-12deg);
+    }
+
     /* 📱 RESPONSIVE */
     @media (max-width: 480px) {
       .screen { padding: 1.7rem 1.2rem; }
+      .intro { margin: 0 -1.2rem; }
+      .intro-slide { padding: 0 1.2rem; }
       h1 { font-size: 1.55rem; line-height: 1.5; }
       p.lead { font-size: 0.93rem; line-height: 1.85; }
-      p.lead-note { font-size: 0.8rem; }
-      .how-title { font-size: 0.86rem; letter-spacing: 0.3em; }
       .train-scene { height: 200px; }
       .ticket { padding: 1.5rem 1.4rem 1.2rem; }
       .ticket-title { font-size: 1.32rem; }
       .ticket-stamp { width: 48px; height: 48px; font-size: 0.62rem; top: 10px; right: 10px; }
-      .how-it-works { padding: 1.1rem 0.95rem; }
-      .step-text { font-size: 0.86rem; }
-      .step-number { width: 24px; height: 24px; font-size: 0.78rem; }
       .btn { padding: 0.95rem 2rem; font-size: 0.98rem; }
       .mood-tag { padding: 0.48rem 0.95rem; font-size: 0.88rem; }
       .main-logo { width: 64px; }
@@ -585,11 +751,25 @@
       .zen-maru-text { font-size: 1.1rem; }
       .train svg { width: 130px; height: 58px; }
     }
+    @media (max-width: 360px) {
+      .intro-title { font-size: 1.04rem; letter-spacing: 0.03em; }
+      .intro-desc { font-size: 0.72rem; letter-spacing: 0.02em; }
+    }
+    @media (max-height: 700px) {
+      #screen-top .main-logo { width: 52px; margin-bottom: 0.4rem; }
+      #screen-top .main-logotype { width: 128px; }
+      #screen-top .brand-subtitle { font-size: 0.8rem; padding-top: 0.2rem; }
+      .intro-stage { height: 168px; }
+      .intro-title { margin-top: 0.7rem; }
+      .intro-dots { margin: 0.5rem 0 0.4rem; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .main-logo, .ambient-particles span, .stars span, .shooting-star,
       .mountains-far, .hills, .poles, .sleepers, .train,
       .bgm-toggle.playing, .bgm-toggle.playing .bgm-bars span,
       .bgm-hint { animation: none !important; }
+      .wx-flake, .wx-drop, .mt-stack.spread .mt-float { animation: none !important; }
+      .intro-tag, .wx-scene, .wx-label, .wx-town, .mt, .intro-dot::before { transition: none !important; }
     }
   </style>
   <script defer src="/_vercel/insights/script.js"></script>
@@ -651,25 +831,38 @@
       <div class="brand-subtitle">- 音楽で帰ろう -</div>
     </div>
 
-    <h1>あなたとふるさとをつなぐ、<br><span class="accent">ちょっとした帰省</span>を。</h1>
-    <p class="lead">今の気分と、ふるさとの空模様をつないで、<br>音楽で数分間だけの「心の帰省」をしませんか？</p>
-    <p class="lead-note">※ 変わらずふるさとで暮らしている方も、<br>安心して「心の帰省」をお楽しみください。</p>
-
-    <div class="how-it-works">
-      <div class="how-title">— CAELOの楽しみ方 —</div>
-      <div class="step">
-        <div class="step-number">1</div>
-        <div class="step-text">あなたの<strong>今の気分</strong>を選んでください</div>
+    <h1 class="visually-hidden">CAELO 音楽で帰ろう</h1>
+    <section class="intro" aria-roledescription="carousel" aria-label="CAELOの楽しみ方">
+      <div class="intro-track" id="intro-track" tabindex="0" aria-label="左右にスワイプ、または矢印キーで切り替え">
+        <div class="intro-slide" role="group" aria-roledescription="slide" aria-label="1 / 3 今の気分を選ぶ">
+          <div class="intro-stage" id="intro-stage-mood"></div>
+          <div class="intro-caption">
+            <h2 class="intro-title">今の気分を選ぶ</h2>
+            <p class="intro-desc">今あなたが感じることを<wbr>いくつでも選んでください。</p>
+          </div>
+        </div>
+        <div class="intro-slide" role="group" aria-roledescription="slide" aria-label="2 / 3 ふるさとの今の天気を呼び出す">
+          <div class="intro-stage" id="intro-stage-weather"></div>
+          <div class="intro-caption">
+            <h2 class="intro-title">ふるさとの<wbr>今の天気を呼び出す</h2>
+            <p class="intro-desc">ふるさとを選ぶと、リアルタイムの天気を呼び出します。</p>
+          </div>
+        </div>
+        <div class="intro-slide" role="group" aria-roledescription="slide" aria-label="3 / 3 一曲を乗せた切符が届く">
+          <div class="intro-stage" id="intro-stage-ticket"></div>
+          <div class="intro-caption">
+            <h2 class="intro-title">一曲を乗せた切符が届く</h2>
+            <p class="intro-desc">気分と天気から<wbr>ぴったりな曲を見つけ出します。</p>
+          </div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-number">2</div>
-        <div class="step-text"><strong>ふるさとの今の空模様</strong>を呼び出します</div>
+      <div class="intro-dots" id="intro-dots">
+        <button class="intro-dot active" aria-label="1枚目：今の気分を選ぶ" aria-current="true"></button>
+        <button class="intro-dot" aria-label="2枚目：ふるさとの今の天気を呼び出す"></button>
+        <button class="intro-dot" aria-label="3枚目：一曲を乗せた切符が届く"></button>
       </div>
-      <div class="step">
-        <div class="step-number">3</div>
-        <div class="step-text">AIが2つをつなぐ<strong>1曲</strong>を選び、<br><strong>切符</strong>にしてあなたへ届けます</div>
-      </div>
-    </div>
+      <div class="visually-hidden" aria-live="polite" id="intro-live"></div>
+    </section>
 
     <button class="btn" onclick="navTo('screen-mood')">帰省する</button>
   </div>
@@ -1651,6 +1844,367 @@
         showToast('画像を保存しました ✓ 手動でシェアしてください');
       }
     }
+
+    /* ─── ファーストビュー：3ステップの体験カルーセル ───
+       ①今の気分を選ぶ（降ってくるタグを触って投げられる）②ふるさとを選ぶと天気が届く ③切符が3枚に広がる。
+       見えているスライドの演出だけを動かし、戻ってきたら最初から再生する。 */
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+    // ① 降ってきて積み上がる気分タグ。積み上がったら2〜3個が順に光る。タップで光り、つかんで投げられる
+    const MoodStage = (() => {
+      const words = ['少し疲れた', '思い出に浸りたい', '恋したい...', '優しくされたい', '温もりを感じたい', '懐かしい', '誰かに会いたい', '現実逃避したい'];
+      const stage = document.getElementById('intro-stage-mood');
+      let engine = null, items = [], raf = 0, timers = [], grab = null, last = 0, quietSince = 0;
+
+      const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+      const draw = () => items.forEach(({ el, body, w, h }) => {
+        if (!body) return; // まだ降ってきていないタグ
+        el.style.transform = `translate(${body.position.x - w / 2}px, ${body.position.y - h / 2}px) rotate(${body.angle}rad)`;
+      });
+      function loop(now) {
+        const dt = Math.min(1000 / 30, now - (last || now));
+        last = now;
+        Matter.Engine.update(engine, dt || 1000 / 60);
+        draw();
+        // 全部が眠って、誰も触っていない状態が1秒続いたら止める（電池のため）。触れば動き出す
+        const asleep = items.length && items.every(i => i.body && i.body.isSleeping) && !grab;
+        if (asleep) { if (!quietSince) quietSince = now; } else quietSince = 0;
+        if (asleep && now - quietSince > 1000) { raf = 0; last = 0; return; }
+        raf = requestAnimationFrame(loop);
+      }
+      const wake = () => { if (!raf && engine) { quietSince = 0; raf = requestAnimationFrame(loop); } };
+
+      function light(item, on, sound) {
+        if (item.el.classList.contains('selected') === on) return;
+        item.el.classList.toggle('selected', on);
+        if (sound && typeof sfx !== 'undefined') on ? sfx.playTagOn() : sfx.playTagOff();
+      }
+
+      function pointerAt(e) { const r = stage.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+      function onDown(item, e) {
+        if (!engine || !item.body) return;
+        e.preventDefault();
+        item.el.setPointerCapture(e.pointerId);
+        const p = pointerAt(e), b = item.body;
+        Matter.Sleeping.set(b, false);
+        const c = Matter.Constraint.create({ pointA: p, bodyB: b, pointB: { x: p.x - b.position.x, y: p.y - b.position.y }, stiffness: 0.18, damping: 0.08, length: 0 });
+        Matter.Composite.add(engine.world, c);
+        grab = { item, c, id: e.pointerId, x0: p.x, y0: p.y, t0: performance.now(), moved: 0, hist: [{ x: p.x, y: p.y, t: performance.now() }] };
+        item.el.classList.add('dragging');
+        wake();
+      }
+      function onMove(e) {
+        if (!grab || e.pointerId !== grab.id) return;
+        const p = pointerAt(e), t = performance.now();
+        grab.c.pointA = p;
+        grab.moved = Math.max(grab.moved, Math.hypot(p.x - grab.x0, p.y - grab.y0));
+        grab.hist.push({ x: p.x, y: p.y, t });
+        while (grab.hist.length > 2 && t - grab.hist[0].t > 90) grab.hist.shift();
+      }
+      function onUp(e) {
+        if (!grab || e.pointerId !== grab.id) return;
+        const { item, c, hist, moved, t0 } = grab;
+        Matter.Composite.remove(engine.world, c);
+        item.el.classList.remove('dragging');
+        if (moved < 7 && performance.now() - t0 < 350) {
+          light(item, !item.el.classList.contains('selected'), true);
+        } else if (hist.length > 1) {
+          // 離したときの指の速さで飛ぶ（Matter の速度は 1ステップ ≒ 16.7ms あたりの移動量）
+          const a = hist[0], b = hist[hist.length - 1], dt = Math.max(16, b.t - a.t);
+          const k = 16.7 / dt, cap = 34;
+          const vx = Math.max(-cap, Math.min(cap, (b.x - a.x) * k)), vy = Math.max(-cap, Math.min(cap, (b.y - a.y) * k));
+          Matter.Body.setVelocity(item.body, { x: vx, y: vy });
+          Matter.Body.setAngularVelocity(item.body, vx * 0.006);
+        }
+        grab = null;
+        wake();
+      }
+
+      function stop() {
+        timers.forEach(clearTimeout); timers = [];
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0; last = 0; grab = null;
+        if (engine) { Matter.Composite.clear(engine.world, false); Matter.Engine.clear(engine); }
+        engine = null; items = [];
+        stage.textContent = '';
+      }
+
+      function start() {
+        stop();
+        if (typeof Matter === 'undefined') return; // ライブラリが来なければ何もしない（ページはそのまま使える）
+        const W = stage.clientWidth, H = stage.clientHeight;
+        engine = Matter.Engine.create({ enableSleeping: true });
+        engine.gravity.y = 1;
+        const wall = { isStatic: true, friction: 0.6, restitution: 0.1 };
+        Matter.Composite.add(engine.world, [
+          Matter.Bodies.rectangle(W / 2, H + 30, W * 3, 60, wall),
+          Matter.Bodies.rectangle(-30, H / 2 - 200, 60, H + 600, wall),
+          Matter.Bodies.rectangle(W + 30, H / 2 - 200, 60, H + 600, wall),
+          Matter.Bodies.rectangle(W / 2, -150, W * 3, 60, wall),
+        ]);
+        const order = words.map(w => w).sort(() => Math.random() - 0.5);
+        items = order.map(word => {
+          const el = document.createElement('div');
+          el.className = 'mood-tag intro-tag';
+          el.textContent = word;
+          el.setAttribute('role', 'button');
+          el.setAttribute('aria-label', `${word}（タップで光る）`);
+          stage.appendChild(el);
+          const w = el.offsetWidth, h = el.offsetHeight;
+          el.style.transform = 'translate(-999px, -999px)';
+          const item = { el, w, h, body: null, word };
+          el.addEventListener('pointerdown', e => onDown(item, e));
+          el.addEventListener('pointermove', onMove);
+          el.addEventListener('pointerup', onUp);
+          el.addEventListener('pointercancel', onUp);
+          el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); light(item, !el.classList.contains('selected'), true); } });
+          el.tabIndex = 0;
+          return item;
+        });
+        const spawn = (item, i) => {
+          const x = item.w / 2 + 6 + Math.random() * Math.max(1, W - item.w - 12);
+          item.body = Matter.Bodies.rectangle(x, -item.h - 10, item.w, item.h, {
+            chamfer: { radius: item.h / 2 - 1 }, restitution: 0.12, friction: 0.55, frictionAir: 0.014, density: 0.0018,
+            angle: (Math.random() - 0.5) * 0.9,
+          });
+          Matter.Body.setAngularVelocity(item.body, (Math.random() - 0.5) * 0.04);
+          Matter.Composite.add(engine.world, item.body);
+        };
+        const glowSome = () => {
+          const picks = items.slice().sort(() => Math.random() - 0.5).slice(0, 2 + Math.round(Math.random()));
+          picks.forEach((it, k) => later(() => light(it, true, false), reduceMotion.matches ? 0 : k * 520));
+        };
+        if (reduceMotion.matches) {
+          // 動きを減らす設定：計算だけ先に済ませて、積み上がった姿を静止で見せる
+          items.forEach((item, i) => { spawn(item, i); for (let n = 0; n < 45; n++) Matter.Engine.update(engine, 1000 / 60); });
+          for (let n = 0; n < 600; n++) Matter.Engine.update(engine, 1000 / 60);
+          draw();
+          glowSome();
+          return;
+        }
+        items.forEach((item, i) => later(() => { spawn(item, i); wake(); }, 120 + i * 170));
+        later(glowSome, 120 + items.length * 170 + 1500);
+        wake();
+      }
+
+      return { start, stop };
+    })();
+
+    // ② ふるさとを選ぶ → 光が空の窓へ届く → 天気が出る。1回 2秒弱、天気は 3秒見せて次の町へ
+    const WeatherStage = (() => {
+      const stage = document.getElementById('intro-stage-weather');
+      const towns = [
+        { pref: '北海道', kind: 'snow', word: '雪', temp: '-3℃' },
+        { pref: '東京都', kind: 'sun', word: '晴れ', temp: '14℃' },
+        { pref: '鹿児島県', kind: 'rain', word: '雨', temp: '16℃' },
+      ];
+      let timers = [], built = false, sky, signal, pick, townBox, scenes = {};
+      const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+      function scene(kind, word, temp) {
+        const el = document.createElement('div');
+        el.className = 'wx-scene';
+        el.dataset.kind = kind;
+        if (kind === 'snow') for (let i = 0; i < 16; i++) {
+          const f = document.createElement('span');
+          const size = 2 + Math.random() * 2.5;
+          f.className = 'wx-flake';
+          Object.assign(f.style, { left: `${Math.random() * 96}%`, width: `${size}px`, height: `${size}px`, animationDuration: `${2.8 + Math.random() * 2.4}s`, animationDelay: `${-Math.random() * 4}s` });
+          el.appendChild(f);
+        }
+        if (kind === 'rain') for (let i = 0; i < 22; i++) {
+          const d = document.createElement('span');
+          d.className = 'wx-drop';
+          Object.assign(d.style, { left: `${Math.random() * 98}%`, height: `${9 + Math.random() * 8}px`, animationDuration: `${0.7 + Math.random() * 0.5}s`, animationDelay: `${-Math.random() * 1.2}s` });
+          el.appendChild(d);
+        }
+        if (kind === 'sun') {
+          el.insertAdjacentHTML('beforeend', '<span class="wx-sun"></span>');
+          [[18, 22, 46, 14], [52, 40, 38, 11], [8, 52, 30, 9]].forEach(([l, t, w, h]) => {
+            const c = document.createElement('span');
+            c.className = 'wx-cloud';
+            Object.assign(c.style, { left: `${l}%`, top: `${t}%`, width: `${w}px`, height: `${h}px` });
+            el.appendChild(c);
+          });
+        }
+        el.insertAdjacentHTML('beforeend', `<div class="wx-label"><span class="wx-word">${word}</span><span class="wx-temp">${temp}</span></div>`);
+        return el;
+      }
+
+      function build() {
+        stage.innerHTML = `
+          <div class="wx">
+            <div class="wx-sky" aria-hidden="true"></div>
+            <div class="wx-signal" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="wx-pick" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.6A2.6 2.6 0 1 1 12 6.4a2.6 2.6 0 0 1 0 5.2z"/></svg>
+              <span class="wx-town-box"></span>
+              <svg viewBox="0 0 12 8" fill="currentColor" style="width:10px;height:7px;opacity:.8"><path d="M6 8L0 0h12z"/></svg>
+            </div>
+          </div>`;
+        sky = stage.querySelector('.wx-sky');
+        signal = stage.querySelector('.wx-signal');
+        pick = stage.querySelector('.wx-pick');
+        townBox = stage.querySelector('.wx-town-box');
+        towns.forEach(t => { scenes[t.kind] = scene(t.kind, t.word, t.temp); sky.appendChild(scenes[t.kind]); });
+        built = true;
+      }
+
+      function setTown(name, animate) {
+        const old = townBox.querySelector('.wx-town:not(.out)');
+        const el = document.createElement('span');
+        el.className = 'wx-town' + (animate ? ' in' : '');
+        el.textContent = name;
+        townBox.appendChild(el);
+        if (old) { old.classList.add('out'); setTimeout(() => old.remove(), 500); }
+        if (animate) requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('in')));
+      }
+
+      function show(kind) { Object.values(scenes).forEach(s => s.classList.toggle('on', s.dataset.kind === kind)); }
+
+      function play(i) {
+        const town = towns[i % towns.length];
+        // 0.0s 町を選ぶ（選択欄が軽く押されて、町の名前が入れ替わる）
+        pick.classList.add('tap');
+        setTown(town.pref, true);
+        show(null); // 前の町の空はいったん引いて、新しい天気を待つ
+        later(() => pick.classList.remove('tap'), 420);
+        // 0.45s 光の粒が空の窓へ上っていく（待ち時間は 0.7秒）
+        later(() => {
+          signal.style.setProperty('--rise', `${signal.offsetHeight + 16}px`);
+          signal.classList.remove('go'); void signal.offsetWidth; signal.classList.add('go');
+        }, 450);
+        // 1.15s 空が変わって、天気と気温が出る。3秒見せて次の町へ
+        later(() => show(town.kind), 1150);
+        later(() => play(i + 1), 1150 + 600 + 3000);
+      }
+
+      function stop() { timers.forEach(clearTimeout); timers = []; }
+      function start() {
+        stop();
+        if (!built) build();
+        show(null);
+        townBox.textContent = '';
+        if (reduceMotion.matches) { setTown(towns[0].pref, false); show(towns[0].kind); return; }
+        setTown('ふるさと', false);
+        later(() => play(0), 500);
+      }
+      return { start, stop };
+    })();
+
+    // ③ 1枚に重なっていた切符が、中心から広がって3枚になる
+    const TicketStage = (() => {
+      const stage = document.getElementById('intro-stage-ticket');
+      // 歌詞の権利を気にせず使える、ふるさとの唱歌
+      const songs = [['l', '朧月夜', '文部省唱歌'], ['c', '故郷', '文部省唱歌'], ['r', '赤とんぼ', '三木露風・山田耕筰']];
+      let stack = null, timers = [];
+      const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+      function build() {
+        stack = document.createElement('div');
+        stack.className = 'mt-stack';
+        stack.setAttribute('aria-hidden', 'true');
+        stack.innerHTML = songs.map(([pos, title, artist]) => `
+          <div class="mt ${pos}"><div class="mt-float"><div class="mt-paper">
+            <div class="mt-label">SOUNDTRACK</div>
+            <div class="mt-title">${title}</div>
+            <div class="mt-artist">${artist}</div>
+            <div class="mt-stamp">帰省<br>確認済</div>
+            <div class="mt-rule"></div>
+            <div class="mt-barcode"></div>
+          </div></div></div>`).join('');
+        stage.appendChild(stack);
+      }
+      function fit() {
+        // 狭い画面では広がりを少し控えて、端の切符が欠けないようにする
+        const half = stage.clientWidth / 2;
+        stack.style.setProperty('--spread', `${Math.max(56, Math.min(88, half - 78))}px`);
+      }
+      function stop() { timers.forEach(clearTimeout); timers = []; }
+      function start() {
+        stop();
+        if (!stack) build();
+        fit();
+        stack.classList.add('instant');
+        stack.classList.remove('shown', 'spread');
+        void stack.offsetWidth;
+        stack.classList.remove('instant');
+        if (reduceMotion.matches) { stack.classList.add('instant', 'shown', 'spread'); return; }
+        later(() => stack.classList.add('shown'), 60);
+        later(() => stack.classList.add('spread'), 520);
+      }
+      return { start, stop, fit };
+    })();
+
+    const IntroCarousel = (() => {
+      const track = document.getElementById('intro-track');
+      const slides = Array.from(track.querySelectorAll('.intro-slide'));
+      const captions = slides.map(s => s.querySelector('.intro-caption'));
+      const dots = Array.from(document.querySelectorAll('#intro-dots .intro-dot'));
+      const live = document.getElementById('intro-live');
+      const phases = [MoodStage, WeatherStage, TicketStage];
+      const titles = ['今の気分を選ぶ', 'ふるさとの今の天気を呼び出す', '一曲を乗せた切符が届く'];
+      let index = -1, ticking = false, ready = false;
+
+      const topVisible = () => document.getElementById('screen-top').classList.contains('active') && !document.hidden;
+      function activate(i, force) {
+        if (i === index && !force) return;
+        if (index >= 0) phases[index].stop();
+        index = i;
+        dots.forEach((d, k) => { d.classList.toggle('active', k === i); if (k === i) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+        live.textContent = `${i + 1} / 3 ${titles[i]}`;
+        if (ready && topVisible()) phases[i].start();
+      }
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          const w = track.clientWidth || 1, pos = track.scrollLeft / w;
+          // 見出しと説明は、横に流れながら少しだけ薄くなる
+          captions.forEach((c, k) => { c.style.opacity = String(1 - Math.min(1, Math.abs(pos - k)) * 0.75); });
+          const i = Math.max(0, Math.min(slides.length - 1, Math.round(pos)));
+          if (i !== index) activate(i);
+        });
+      }
+      function go(i) {
+        i = Math.max(0, Math.min(slides.length - 1, i));
+        track.scrollTo({ left: i * track.clientWidth, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      }
+      track.addEventListener('scroll', onScroll, { passive: true });
+      dots.forEach((d, k) => d.addEventListener('click', () => go(k)));
+      track.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); go(index + 1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); go(index - 1); }
+      });
+      // トップ画面が見えなくなったら演出を止め、戻ってきたら今のスライドを最初から
+      function refresh() {
+        if (!ready) return;
+        if (topVisible()) phases[Math.max(0, index)].start();
+        else phases.forEach(p => p.stop());
+      }
+      document.addEventListener('visibilitychange', refresh);
+      let resizeTimer = 0;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => { track.scrollLeft = Math.max(0, index) * track.clientWidth; refresh(); }, 250);
+      });
+      function begin() {
+        if (ready) return;
+        ready = true;
+        activate(Math.round(track.scrollLeft / (track.clientWidth || 1)), true);
+      }
+      return { begin, refresh };
+    })();
+
+    // 画面を移るたびに、トップのカルーセルを止める・再開する
+    const _navTo = navTo;
+    navTo = function (targetId) { _navTo(targetId); IntroCarousel.refresh(); };
+
+    window.addEventListener('load', () => {
+      const go = () => IntroCarousel.begin();
+      (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(go, go);
+    });
   </script>
 </body>
 </html>

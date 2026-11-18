@@ -594,17 +594,6 @@
     .intro-dot:focus-visible { outline: none; }
     .intro-dot:focus-visible::before { box-shadow: 0 0 0 3px rgba(226, 207, 124, 0.45); }
 
-    /* 舞台の後ろに大きく置く 1・2・3（Figma 144:194：白の 37%、ステップの番号） */
-    .intro-slide { position: relative; container-type: size; }
-    .intro-num {
-      position: absolute; left: 0; right: 0; top: 0; z-index: 0; pointer-events: none; user-select: none;
-      text-align: center; font-family: 'Nunito', sans-serif; font-weight: 700; line-height: 1;
-      font-size: clamp(96px, 56cqh, 236px); color: rgba(255, 255, 255, 0.37);
-      opacity: 0; transform: translateY(10px);
-      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .intro-slide.on .intro-num { opacity: 1; transform: none; }
-    .intro-stage { z-index: 1; }
     /* フェーズ1：降ってくる気分タグ */
     .intro-tag {
       position: absolute; left: 0; top: 0; margin: 0; white-space: nowrap;
@@ -621,8 +610,8 @@
       box-shadow: 0 0 18px rgba(226, 207, 124, 0.55), 0 6px 18px rgba(226, 207, 124, 0.3);
     }
 
-    /* フェーズ2：ふるさとを選ぶ → 天気が届く（舞台の下寄せ：後ろの数字が上にのぞく） */
-    .wx { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2px; }
+    /* フェーズ2：ふるさとを選ぶ → 天気が届く */
+    .wx { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .wx-sky {
       position: relative; width: min(240px, 80%); height: clamp(92px, 46%, 124px); flex-shrink: 0; border-radius: 18px; overflow: hidden;
       background: linear-gradient(180deg, #1a1f33 0%, #232a42 100%);
@@ -691,7 +680,7 @@
     .wx-town.in { transform: translateY(100%); opacity: 0; }
 
     /* フェーズ3：広がる3枚の切符 */
-    .mt-stack { position: absolute; left: 50%; top: 63%; width: 0; height: 0; --spread: 84px; }
+    .mt-stack { position: absolute; left: 50%; top: 50%; width: 0; height: 0; --spread: 84px; }
     .mt {
       position: absolute; left: 0; top: 0; width: 112px; height: 146px; margin: -73px 0 0 -56px;
       transform: translate(0, 0) rotate(var(--r0, 0deg)) scale(0.96); opacity: 0;
@@ -795,7 +784,7 @@
       .bgm-toggle.playing, .bgm-toggle.playing .bgm-bars span,
       .bgm-hint { animation: none !important; }
       .wx-flake, .wx-drop, .mt-stack.spread .mt-float { animation: none !important; }
-      .intro-tag, .wx-scene, .wx-label, .wx-town, .mt, .intro-dot::before, .intro-num { transition: none !important; }
+      .intro-tag, .wx-scene, .wx-label, .wx-town, .mt, .intro-dot::before { transition: none !important; }
     }
   </style>
   <script defer src="/_vercel/insights/script.js"></script>
@@ -861,7 +850,6 @@
     <section class="intro" aria-roledescription="carousel" aria-label="CAELOの楽しみ方">
       <div class="intro-track" id="intro-track" tabindex="0" aria-label="左右にスワイプ、または矢印キーで切り替え">
         <div class="intro-slide" role="group" aria-roledescription="slide" aria-label="1 / 3 今の気分を選ぶ">
-          <div class="intro-num" aria-hidden="true">1</div>
           <div class="intro-stage" id="intro-stage-mood"></div>
           <div class="intro-caption">
             <h2 class="intro-title">今の気分を選ぶ</h2>
@@ -869,7 +857,6 @@
           </div>
         </div>
         <div class="intro-slide" role="group" aria-roledescription="slide" aria-label="2 / 3 ふるさとの今の天気を呼び出す">
-          <div class="intro-num" aria-hidden="true">2</div>
           <div class="intro-stage" id="intro-stage-weather"></div>
           <div class="intro-caption">
             <h2 class="intro-title">ふるさとの<wbr>今の天気を呼び出す</h2>
@@ -877,7 +864,6 @@
           </div>
         </div>
         <div class="intro-slide" role="group" aria-roledescription="slide" aria-label="3 / 3 一曲を乗せた切符が届く">
-          <div class="intro-num" aria-hidden="true">3</div>
           <div class="intro-stage" id="intro-stage-ticket"></div>
           <div class="intro-caption">
             <h2 class="intro-title">一曲を乗せた切符が届く</h2>
@@ -2184,7 +2170,6 @@
         if (i === index && !force) return;
         if (index >= 0) phases[index].stop();
         index = i;
-        slides.forEach((sl, k) => sl.classList.toggle('on', k === i));
         dots.forEach((d, k) => { d.classList.toggle('active', k === i); if (k === i) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
         live.textContent = `${i + 1} / 3 ${titles[i]}`;
         if (ready && topVisible()) phases[i].start();
